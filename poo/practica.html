@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Práctica POO PHP — SENA 3066552</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --poo:#7c3aed; --poo2:#f59e0b; }
+    body { background:#f8f9fa; font-family:'Segoe UI',sans-serif; }
+    .sidebar { position:sticky; top:70px; height:calc(100vh - 90px); overflow-y:auto; }
+    .nav-link-side { display:block; padding:6px 12px; border-radius:8px; font-size:.85rem; color:#495057; text-decoration:none; transition:background .15s; }
+    .nav-link-side:hover,.nav-link-side.active { background:#ede9fe; color:var(--poo); font-weight:600; }
+    .step-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07); padding:2rem; margin-bottom:2rem; scroll-margin-top:80px; }
+    .step-badge { width:36px; height:36px; border-radius:50%; background:var(--poo); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+    pre { background:#0d1117; color:#e6edf3; border-radius:10px; padding:1.2rem; font-size:.83rem; overflow-x:auto; line-height:1.7; }
+    code.i { background:#1e2a35; color:#a78bfa; padding:2px 6px; border-radius:4px; font-size:.88em; }
+    .kw  { color:#ff7b72; } .str { color:#a5d6ff; } .cmt { color:#8b949e; }
+    .cls { color:#ffa657; } .fn  { color:#d2a8ff; } .num { color:#79c0ff; }
+    .kw2 { color:#f59e0b; }
+    .todo-box { background:#1a1a2e; border:2px dashed var(--poo); border-radius:12px; padding:1rem 1.2rem; margin:1rem 0; }
+    .todo-num { background:var(--poo2); color:#fff; border-radius:4px; padding:2px 8px; font-size:.8rem; font-weight:700; margin-right:6px; }
+    .tip { background:#f0fdf4; border:1px solid #86efac; border-radius:8px; padding:.8rem 1rem; margin:.6rem 0; font-size:.87rem; }
+    .warn { background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:.8rem 1rem; margin:.6rem 0; font-size:.87rem; }
+    .navbar { background:#0f0c1a !important; border-bottom:2px solid var(--poo); position:sticky; top:0; z-index:1030; }
+    .checklist li { padding:4px 0; }
+    .checklist li::marker { color:var(--poo); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="index.html">
+      <i class="fas fa-cube me-2" style="color:var(--poo2)"></i>
+      POO PHP — Guía de Práctica
+    </a>
+    <a href="teoria.html" class="btn btn-sm btn-outline-secondary text-light">
+      <i class="fas fa-book me-1"></i> Teoría
+    </a>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-2 d-none d-lg-block py-3 ps-3 pe-0">
+      <div class="sidebar">
+        <div class="small fw-bold text-muted text-uppercase px-2 mb-2" style="font-size:.68rem;letter-spacing:.08em">Pasos</div>
+        <a href="#p0"  class="nav-link-side">0. Estructura</a>
+        <a href="#p1"  class="nav-link-side">1. Interface (TODO 1)</a>
+        <a href="#p2"  class="nav-link-side">2. Abstract Vehiculo (2-7)</a>
+        <a href="#p3"  class="nav-link-side">3. Auto (8-11)</a>
+        <a href="#p4"  class="nav-link-side">4. Moto (12-15)</a>
+        <a href="#p5"  class="nav-link-side">5. Camion (16-19)</a>
+        <a href="#p6"  class="nav-link-side">6. index.php (20-23)</a>
+        <a href="#p7"  class="nav-link-side">7. Flota (24-26)</a>
+        <a href="#p8"  class="nav-link-side">8. Detalle (29-30)</a>
+        <a href="#p9"  class="nav-link-side">9. Layout (27-28)</a>
+        <a href="#ver" class="nav-link-side">✓ Verificar</a>
+        <div class="mt-3 px-2">
+          <a href="enunciado.html" class="btn btn-sm w-100 mb-1" style="background:var(--poo);color:#fff;font-size:.75rem">
+            <i class="fas fa-file-alt me-1"></i> Enunciado
+          </a>
+          <a href="practica_app/" class="btn btn-sm btn-outline-secondary w-100" style="font-size:.75rem">
+            <i class="fas fa-folder-open me-1"></i> practica_app/
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="col-lg-10 py-4 px-4">
+
+      <div class="mb-4">
+        <h1 class="fw-bold mb-1">
+          <i class="fas fa-keyboard me-2" style="color:var(--poo2)"></i>
+          Flota Vehicular — Guía de TODOs
+        </h1>
+        <p class="text-muted">
+          Completa los <code class="i">???</code> en <code class="i">practica_app/</code>.
+          Hay <strong>30 TODOs</strong> numerados. Sigue el orden: primero las clases, luego las vistas.
+        </p>
+      </div>
+
+      <!-- PASO 0 -->
+      <div id="p0" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">0</div>
+          <h3 class="fw-bold mb-0">Estructura de archivos</h3>
+        </div>
+        <pre style="font-size:.8rem">practica_app/
+├── index.php                   ← TODO 20-23
+├── classes/
+│   ├── Conducible.php          ← TODO 1   ⭐ (empezar aquí)
+│   ├── Vehiculo.php            ← TODO 2-7
+│   ├── Auto.php                ← TODO 8-11
+│   ├── Moto.php                ← TODO 12-15
+│   └── Camion.php              ← TODO 16-19
+├── includes/
+│   ├── header.php              ← TODO 27
+│   └── footer.php              ← TODO 28
+└── pages/
+    ├── flota.php               ← TODO 24-26
+    └── detalle.php             ← TODO 29-30</pre>
+        <div class="tip">
+          <strong class="text-success">Orden recomendado:</strong>
+          Primero construye las clases (TODOs 1-19) y pruébalas individualmente en un
+          <code class="i">test.php</code> temporal antes de pasar a las vistas.
+        </div>
+      </div>
+
+      <!-- PASO 1: Interface -->
+      <div id="p1" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">1</div>
+          <h3 class="fw-bold mb-0">Interface <code class="i">Conducible</code></h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">classes/Conducible.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 1</span>
+          <span class="fw-bold">Definir la interface con 3 métodos</span>
+        </div>
+
+        <h5 class="fw-bold mt-3">Solución:</h5>
+        <pre><span class="kw2">interface</span> <span class="cls">Conducible</span>
+{
+    <span class="kw">public function</span> <span class="fn">arrancar</span>(): <span class="cls">string</span>;
+    <span class="kw">public function</span> <span class="fn">frenar</span>(): <span class="cls">string</span>;
+    <span class="kw">public function</span> <span class="fn">calcularCombustible</span>(<span class="cls">float</span> <span class="kw">$km</span>): <span class="cls">float</span>;
+}</pre>
+        <div class="tip">
+          Las interfaces solo declaran la <strong>firma</strong> del método.
+          Sin llaves, sin cuerpo, solo la declaración terminada en <code class="i">;</code>
+        </div>
+      </div>
+
+      <!-- PASO 2: Abstract Vehiculo -->
+      <div id="p2" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">2</div>
+          <h3 class="fw-bold mb-0">Abstract class <code class="i">Vehiculo</code></h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">classes/Vehiculo.php</code></p>
+
+        <div class="todo-box"><span class="todo-num">TODO 2</span><span class="fw-bold">Cabecera: <code>abstract class Vehiculo implements Conducible</code></span></div>
+        <div class="todo-box"><span class="todo-num">TODO 3</span><span class="fw-bold">4 métodos abstractos: getTipo, getIcono, getColor, consumoPor100km</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 4</span><span class="fw-bold">calcularCombustible() usando consumoPor100km()</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 5</span><span class="fw-bold">Getters: getMarca(), getModelo(), getAnio(), getPrecio(), getPrecioFormateado()</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 6</span><span class="fw-bold">Método estático: getContador()</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 7</span><span class="fw-bold">Magic method: __toString() → "[Auto] Ford Mustang 2023"</span></div>
+
+        <h5 class="fw-bold mt-4">Solución guiada:</h5>
+        <pre><span class="kw2">abstract</span> <span class="kw">class</span> <span class="cls">Vehiculo</span> <span class="kw">implements</span> <span class="cls">Conducible</span>
+{
+    <span class="kw">private static</span> <span class="cls">int</span> <span class="kw">$contador</span> = <span class="num">0</span>;
+
+    <span class="kw">public function</span> <span class="fn">__construct</span>(
+        <span class="kw">protected</span> <span class="cls">string</span> <span class="kw">$marca</span>,
+        <span class="kw">protected</span> <span class="cls">string</span> <span class="kw">$modelo</span>,
+        <span class="kw">protected</span> <span class="cls">int</span>    <span class="kw">$anio</span>,
+        <span class="kw">protected</span> <span class="cls">float</span>  <span class="kw">$precio</span>
+    ) {
+        <span class="kw">self</span>::<span class="kw">$contador</span>++;
+    }
+
+    <span class="cmt">// Métodos abstractos que cada hija debe implementar</span>
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">getTipo</span>():           <span class="cls">string</span>;
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">getIcono</span>():          <span class="cls">string</span>;
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">getColor</span>():          <span class="cls">string</span>;
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">consumoPor100km</span>():   <span class="cls">float</span>;
+
+    <span class="cmt">// Implementación del contrato: usa el método abstracto</span>
+    <span class="kw">public function</span> <span class="fn">calcularCombustible</span>(<span class="cls">float</span> <span class="kw">$km</span>): <span class="cls">float</span>
+    {
+        <span class="kw">return</span> <span class="fn">round</span>((<span class="kw">$km</span> / <span class="num">100</span>) * <span class="kw">$this</span>-><span class="fn">consumoPor100km</span>(), <span class="num">2</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">getMarca</span>():  <span class="cls">string</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">marca</span>;  }
+    <span class="kw">public function</span> <span class="fn">getModelo</span>(): <span class="cls">string</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">modelo</span>; }
+    <span class="kw">public function</span> <span class="fn">getAnio</span>():   <span class="cls">int</span>    { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">anio</span>;   }
+    <span class="kw">public function</span> <span class="fn">getPrecio</span>(): <span class="cls">float</span>  { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">precio</span>; }
+
+    <span class="kw">public function</span> <span class="fn">getPrecioFormateado</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="str">'$'</span> . <span class="fn">number_format</span>(<span class="kw">$this</span>-><span class="kw">precio</span>, <span class="num">0</span>, <span class="str">','</span>, <span class="str">'.'</span>);
+    }
+
+    <span class="kw">public static function</span> <span class="fn">getContador</span>(): <span class="cls">int</span>
+    {
+        <span class="kw">return</span> <span class="kw">self</span>::<span class="kw">$contador</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">__toString</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="fn">sprintf</span>(<span class="str">'[%s] %s %s %d'</span>,
+            <span class="kw">$this</span>-><span class="fn">getTipo</span>(), <span class="kw">$this</span>-><span class="kw">marca</span>, <span class="kw">$this</span>-><span class="kw">modelo</span>, <span class="kw">$this</span>-><span class="kw">anio</span>);
+    }
+}</pre>
+      </div>
+
+      <!-- PASO 3: Auto -->
+      <div id="p3" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">3</div>
+          <h3 class="fw-bold mb-0">Clase <code class="i">Auto</code></h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">classes/Auto.php</code></p>
+        <div class="todo-box"><span class="todo-num">TODO 8</span> <span class="fw-bold">class Auto extends Vehiculo con propiedad $puertas</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 9</span> <span class="fw-bold">Implementar getTipo, getIcono, getColor, consumoPor100km</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 10</span><span class="fw-bold">Implementar arrancar() y frenar()</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 11</span><span class="fw-bold">Getter getPuertas()</span></div>
+
+        <pre><span class="kw">class</span> <span class="cls">Auto</span> <span class="kw">extends</span> <span class="cls">Vehiculo</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(
+        <span class="cls">string</span> <span class="kw">$marca</span>, <span class="cls">string</span> <span class="kw">$modelo</span>, <span class="cls">int</span> <span class="kw">$anio</span>, <span class="cls">float</span> <span class="kw">$precio</span>,
+        <span class="kw">private</span> <span class="cls">int</span> <span class="kw">$puertas</span> = <span class="num">4</span>
+    ) {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>(<span class="kw">$marca</span>, <span class="kw">$modelo</span>, <span class="kw">$anio</span>, <span class="kw">$precio</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">getTipo</span>():         <span class="cls">string</span> { <span class="kw">return</span> <span class="str">'Auto'</span>; }
+    <span class="kw">public function</span> <span class="fn">getIcono</span>():        <span class="cls">string</span> { <span class="kw">return</span> <span class="str">'fas fa-car'</span>; }
+    <span class="kw">public function</span> <span class="fn">getColor</span>():        <span class="cls">string</span> { <span class="kw">return</span> <span class="str">'#3b82f6'</span>; }
+    <span class="kw">public function</span> <span class="fn">consumoPor100km</span>(): <span class="cls">float</span>  { <span class="kw">return</span> <span class="num">8.5</span>; }
+
+    <span class="kw">public function</span> <span class="fn">arrancar</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="str">"El Auto {$this->marca} {$this->modelo} arranca con la llave."</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">frenar</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="str">"El Auto {$this->marca} frena con discos de freno."</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">getPuertas</span>(): <span class="cls">int</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">puertas</span>; }
+}</pre>
+        <div class="warn">
+          <strong>⚠ No olvides:</strong> siempre llama <code class="i">parent::__construct()</code>
+          o el contador estático de Vehiculo no se incrementará.
+        </div>
+      </div>
+
+      <!-- PASO 4-5: Moto y Camion -->
+      <div id="p4" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">4</div>
+          <h3 class="fw-bold mb-0">Clases <code class="i">Moto</code> y <code class="i">Camion</code></h3>
+        </div>
+        <p class="text-muted">Archivos: <code class="i">classes/Moto.php</code> · <code class="i">classes/Camion.php</code></p>
+
+        <div class="todo-box"><span class="todo-num">TODO 12-15</span><span class="fw-bold">Moto: igual que Auto pero con cilindrada, color ámbar (#f59e0b), 4.0 L/100km</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 16-19</span><span class="fw-bold">Camion: capacidadTon + ejes, color rojo (#e74c3c), 28.0 L/100km</span></div>
+
+        <div class="tip">
+          <strong>Patrón exactamente igual que Auto.</strong>
+          Cambia: nombre de clase, propiedad propia, valores en los métodos abstractos y los mensajes de arrancar()/frenar().
+        </div>
+      </div>
+
+      <!-- PASO 6: index.php -->
+      <div id="p6" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">6</div>
+          <h3 class="fw-bold mb-0">index.php — estadísticas de la flota</h3>
+        </div>
+        <div class="todo-box"><span class="todo-num">TODO 20</span><span class="fw-bold">Cargar las 5 clases con require_once</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 21-22</span><span class="fw-bold">Crear 5+ vehículos en el array $flota</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 23</span><span class="fw-bold">Mostrar total, Vehiculo::getContador(), conteo por tipo, botón</span></div>
+
+        <pre><span class="cmt">// Crear el array polimórfico</span>
+<span class="kw">$flota</span> = [
+    <span class="kw">new</span> <span class="cls">Auto</span>(<span class="str">'Toyota'</span>, <span class="str">'Corolla'</span>, <span class="num">2022</span>, <span class="num">75000000</span>),
+    <span class="kw">new</span> <span class="cls">Auto</span>(<span class="str">'Ford'</span>,   <span class="str">'Mustang'</span>, <span class="num">2023</span>, <span class="num">180000000</span>, <span class="num">2</span>),
+    <span class="kw">new</span> <span class="cls">Moto</span>(<span class="str">'Honda'</span>,  <span class="str">'CB500'</span>,   <span class="num">2021</span>, <span class="num">25000000</span>, <span class="num">500</span>),
+    <span class="kw">new</span> <span class="cls">Moto</span>(<span class="str">'Yamaha'</span>, <span class="str">'R1'</span>,      <span class="num">2023</span>, <span class="num">60000000</span>, <span class="num">1000</span>),
+    <span class="kw">new</span> <span class="cls">Camion</span>(<span class="str">'Kenworth'</span>, <span class="str">'T680'</span>, <span class="num">2020</span>, <span class="num">450000000</span>, <span class="num">30.0</span>, <span class="num">5</span>),
+];
+
+<span class="cmt">// Contar por tipo con instanceof</span>
+<span class="kw">$autos</span>   = <span class="fn">count</span>(<span class="fn">array_filter</span>(<span class="kw">$flota</span>, <span class="kw">fn</span>(<span class="kw">$v</span>) => <span class="kw">$v</span> <span class="kw">instanceof</span> <span class="cls">Auto</span>));
+<span class="kw">$motos</span>   = <span class="fn">count</span>(<span class="fn">array_filter</span>(<span class="kw">$flota</span>, <span class="kw">fn</span>(<span class="kw">$v</span>) => <span class="kw">$v</span> <span class="kw">instanceof</span> <span class="cls">Moto</span>));
+<span class="kw">$camiones</span>= <span class="fn">count</span>(<span class="fn">array_filter</span>(<span class="kw">$flota</span>, <span class="kw">fn</span>(<span class="kw">$v</span>) => <span class="kw">$v</span> <span class="kw">instanceof</span> <span class="cls">Camion</span>));
+
+<span class="fn">echo</span> <span class="str">'Total: '</span> . <span class="fn">count</span>(<span class="kw">$flota</span>);
+<span class="fn">echo</span> <span class="str">'Contador estático: '</span> . <span class="cls">Vehiculo</span>::<span class="fn">getContador</span>();</pre>
+      </div>
+
+      <!-- PASO 7: Flota -->
+      <div id="p7" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">7</div>
+          <h3 class="fw-bold mb-0">pages/flota.php — POLIMORFISMO en acción</h3>
+        </div>
+        <div class="todo-box"><span class="todo-num">TODO 24</span><span class="fw-bold">Cargar clases, crear $flota</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 25</span><span class="fw-bold">Filtro opcional: if($tipo) filtra el array</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 26</span><span class="fw-bold">Grid de tarjetas — mismo foreach para todos</span></div>
+
+        <pre><span class="cmt">// POLIMORFISMO: el mismo bucle funciona con todos los tipos</span>
+<span class="kw">foreach</span> (<span class="kw">$flota</span> <span class="kw">as</span> <span class="kw">$v</span>):  <span class="cmt">// $v puede ser Auto, Moto o Camion</span>
+?>
+&lt;div class="card" style="border-top:3px solid &lt;?= <span class="fn">htmlspecialchars</span>(<span class="kw">$v</span>-><span class="fn">getColor</span>()) ?&gt;"&gt;
+    &lt;i class="&lt;?= <span class="fn">htmlspecialchars</span>(<span class="kw">$v</span>-><span class="fn">getIcono</span>()) ?&gt;"&gt;&lt;/i&gt;
+    &lt;h5&gt;&lt;?= <span class="fn">htmlspecialchars</span>(<span class="kw">$v</span>-><span class="fn">getMarca</span>() . <span class="str">' '</span> . <span class="kw">$v</span>-><span class="fn">getModelo</span>()) ?&gt;&lt;/h5&gt;
+    &lt;p&gt;Precio: &lt;?= <span class="fn">htmlspecialchars</span>(<span class="kw">$v</span>-><span class="fn">getPrecioFormateado</span>()) ?&gt;&lt;/p&gt;
+    &lt;p&gt;Combustible 300km: &lt;?= <span class="kw">$v</span>-><span class="fn">calcularCombustible</span>(<span class="num">300</span>) ?&gt; L&lt;/p&gt;
+    &lt;p&gt;&lt;?= <span class="fn">htmlspecialchars</span>(<span class="kw">$v</span>-><span class="fn">arrancar</span>()) ?&gt;&lt;/p&gt;
+&lt;/div&gt;
+<?php <span class="kw">endforeach</span>;</pre>
+      </div>
+
+      <!-- PASO 8: Detalle -->
+      <div id="p8" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">8</div>
+          <h3 class="fw-bold mb-0">pages/detalle.php — <code class="i">instanceof</code></h3>
+        </div>
+        <div class="todo-box"><span class="todo-num">TODO 29</span><span class="fw-bold">Crear el vehículo según $_GET['tipo'] con match o if/elseif</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 30</span><span class="fw-bold">Mostrar datos + tabla de combustible + propiedad específica con instanceof</span></div>
+        <pre><span class="kw">$tipo</span> = <span class="kw">$_GET</span>[<span class="str">'tipo'</span>] ?? <span class="str">'auto'</span>;
+
+<span class="kw">$vehiculo</span> = <span class="kw">match</span>(<span class="kw">$tipo</span>) {
+    <span class="str">'auto'</span>   => <span class="kw">new</span> <span class="cls">Auto</span>(<span class="str">'Toyota'</span>, <span class="str">'Corolla'</span>, <span class="num">2022</span>, <span class="num">75000000</span>),
+    <span class="str">'moto'</span>   => <span class="kw">new</span> <span class="cls">Moto</span>(<span class="str">'Honda'</span>,  <span class="str">'CB500'</span>,   <span class="num">2021</span>, <span class="num">25000000</span>, <span class="num">500</span>),
+    <span class="str">'camion'</span> => <span class="kw">new</span> <span class="cls">Camion</span>(<span class="str">'Kenworth'</span>,<span class="str">'T680'</span>, <span class="num">2020</span>, <span class="num">450000000</span>),
+    <span class="kw">default</span>  => null,
+};
+
+<span class="kw">if</span> (!<span class="kw">$vehiculo</span>) { <span class="fn">header</span>(<span class="str">'Location: flota.php'</span>); <span class="fn">exit</span>; }
+
+<span class="cmt">// Tabla de combustible (polimórfica)</span>
+<span class="kw">foreach</span> ([<span class="num">100</span>, <span class="num">300</span>, <span class="num">500</span>, <span class="num">1000</span>] <span class="kw">as</span> <span class="kw">$km</span>) {
+    <span class="fn">echo</span> <span class="kw">$km</span> . <span class="str">' km → '</span> . <span class="kw">$vehiculo</span>-><span class="fn">calcularCombustible</span>(<span class="kw">$km</span>) . <span class="str">' L'</span>;
+}
+
+<span class="cmt">// Propiedad específica por clase</span>
+<span class="kw">if</span> (<span class="kw">$vehiculo</span> <span class="kw">instanceof</span> <span class="cls">Auto</span>)   <span class="fn">echo</span> <span class="str">'Puertas: '</span>  . <span class="kw">$vehiculo</span>-><span class="fn">getPuertas</span>();
+<span class="kw">if</span> (<span class="kw">$vehiculo</span> <span class="kw">instanceof</span> <span class="cls">Moto</span>)   <span class="fn">echo</span> <span class="str">'Cilindrada: '</span> . <span class="kw">$vehiculo</span>-><span class="fn">getCilindrada</span>() . <span class="str">'cc'</span>;
+<span class="kw">if</span> (<span class="kw">$vehiculo</span> <span class="kw">instanceof</span> <span class="cls">Camion</span>) <span class="fn">echo</span> <span class="str">'Carga: '</span>    . <span class="kw">$vehiculo</span>-><span class="fn">getCapacidadTon</span>() . <span class="str">'T'</span>;</pre>
+      </div>
+
+      <!-- PASO 9: Layout -->
+      <div id="p9" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">9</div>
+          <h3 class="fw-bold mb-0">Layout — navbar y footer</h3>
+        </div>
+        <div class="todo-box"><span class="todo-num">TODO 27</span><span class="fw-bold">header.php: variable CSS, navbar con links, nombre de empresa</span></div>
+        <div class="todo-box"><span class="todo-num">TODO 28</span><span class="fw-bold">footer.php: cierra main, footer con badge "Clases · Herencia · Polimorfismo"</span></div>
+      </div>
+
+      <!-- VERIFICACIÓN -->
+      <div id="ver" class="step-card" style="border:2px solid var(--poo)">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge" style="background:#27ae60"><i class="fas fa-check"></i></div>
+          <h3 class="fw-bold mb-0">Verificación final</h3>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-bold mb-3">Checklist</h5>
+            <ul class="checklist">
+              <li><code class="i">Conducible</code> tiene 3 métodos declarados</li>
+              <li><code class="i">Vehiculo</code> es abstracta, no se puede instanciar</li>
+              <li>Auto, Moto y Camion extienden Vehiculo</li>
+              <li>Todas las clases llaman <code class="i">parent::__construct()</code></li>
+              <li><code class="i">Vehiculo::getContador()</code> muestra el total correcto</li>
+              <li>La lista muestra todos los vehículos</li>
+              <li>El polimorfismo funciona: mismos métodos, resultados distintos</li>
+              <li><code class="i">instanceof</code> muestra la propiedad específica en detalle</li>
+              <li><code class="i">echo $vehiculo</code> muestra <code class="i">__toString()</code></li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold mb-3">URLs</h5>
+            <div style="font-family:monospace; font-size:.8rem; background:#0d1117; color:#56d157; border-radius:8px; padding:1rem">
+              <div>✓ practica_app/index.php</div>
+              <div>✓ practica_app/pages/flota.php</div>
+              <div>✓ practica_app/pages/flota.php?tipo=moto</div>
+              <div>✓ practica_app/pages/detalle.php?tipo=auto</div>
+              <div>✓ practica_app/pages/detalle.php?tipo=moto</div>
+              <div>✓ practica_app/pages/detalle.php?tipo=camion</div>
+            </div>
+            <a href="enunciado.html" class="btn mt-3 w-100" style="background:var(--poo);color:#fff">
+              <i class="fas fa-star me-1"></i> Ver criterios de evaluación
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const sections = document.querySelectorAll('[id]');
+const links    = document.querySelectorAll('.nav-link-side');
+const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = document.querySelector(`.nav-link-side[href="#${e.target.id}"]`);
+            if (a) a.classList.add('active');
+        }
+    });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

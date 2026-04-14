@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teoría POO PHP — SENA 3066552</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --poo:#7c3aed; --poo2:#f59e0b; }
+    body { background:#f8f9fa; font-family:'Segoe UI',sans-serif; }
+    .sidebar { position:sticky; top:80px; height:calc(100vh - 100px); overflow-y:auto; }
+    .nav-section { font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#6c757d; padding:10px 12px 4px; }
+    .nav-link-side { display:block; padding:6px 12px; border-radius:8px; font-size:.87rem; color:#495057; text-decoration:none; transition:background .15s; }
+    .nav-link-side:hover,.nav-link-side.active { background:#ede9fe; color:var(--poo); font-weight:600; }
+    .section { scroll-margin-top: 80px; }
+    .card-section { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07); padding:2rem; margin-bottom:2rem; }
+    pre { background:#0d1117; color:#e6edf3; border-radius:10px; padding:1.2rem; font-size:.83rem; overflow-x:auto; line-height:1.7; }
+    code.i { background:#1e2a35; color:#a78bfa; padding:2px 6px; border-radius:4px; font-size:.88em; }
+    .kw  { color:#ff7b72; } .str { color:#a5d6ff; } .cmt { color:#8b949e; }
+    .cls { color:#ffa657; } .fn  { color:#d2a8ff; } .num { color:#79c0ff; }
+    .kw2 { color:#f59e0b; } /* abstract, interface, trait */
+    .box-info    { background:#f5f3ff; border:1px solid #c4b5fd; border-radius:10px; }
+    .box-success { background:#f0fdf4; border:1px solid #86efac; border-radius:10px; }
+    .box-warning { background:#fffbeb; border:1px solid #fde68a; border-radius:10px; }
+    .box-danger  { background:#fff1f2; border:1px solid #fecdd3; border-radius:10px; }
+    .compare-bad  { background:#fff1f2; border:2px solid #f87171; border-radius:10px; }
+    .compare-good { background:#f0fdf4; border:2px solid #4ade80; border-radius:10px; }
+    .navbar { background:#0f0c1a !important; border-bottom:2px solid var(--poo); position:sticky; top:0; z-index:1030; }
+    .badge-poo { background:var(--poo); color:#fff; }
+    table.neat th { background:#1e1040; color:#e2e8f0; }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="index.html">
+      <i class="fas fa-cube me-2" style="color:var(--poo2)"></i>
+      POO en PHP
+    </a>
+    <div class="d-flex gap-3">
+      <a href="demo/index.php" class="btn btn-sm" style="background:var(--poo);color:#fff">
+        <i class="fas fa-dragon me-1"></i> Demo RPG
+      </a>
+      <a href="practica.html" class="btn btn-sm btn-outline-secondary text-light">
+        <i class="fas fa-keyboard me-1"></i> Práctica
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-2 d-none d-lg-block py-3 ps-3 pe-0">
+      <div class="sidebar">
+        <div class="nav-section">Bases</div>
+        <a href="#s1"  class="nav-link-side active">1. ¿Qué es la POO?</a>
+        <a href="#s2"  class="nav-link-side">2. Clase y Objeto</a>
+        <a href="#s3"  class="nav-link-side">3. Constructor</a>
+        <a href="#s4"  class="nav-link-side">4. Encapsulamiento</a>
+        <div class="nav-section mt-2">Pilares</div>
+        <a href="#s5"  class="nav-link-side">5. Herencia</a>
+        <a href="#s6"  class="nav-link-side">6. Clase Abstracta</a>
+        <a href="#s7"  class="nav-link-side">7. Interface</a>
+        <a href="#s8"  class="nav-link-side">8. Polimorfismo</a>
+        <div class="nav-section mt-2">Avanzado</div>
+        <a href="#s9"  class="nav-link-side">9. Static</a>
+        <a href="#s10" class="nav-link-side">10. Traits</a>
+        <a href="#s11" class="nav-link-side">11. Magic Methods</a>
+        <a href="#s12" class="nav-link-side">12. PHP 8 moderno</a>
+        <a href="#s13" class="nav-link-side">13. Resumen</a>
+        <div class="mt-3 ps-2">
+          <a href="demo/index.php" class="btn btn-sm w-100 mb-1" style="background:var(--poo);color:#fff;font-size:.75rem">
+            <i class="fas fa-dragon me-1"></i> Demo RPG
+          </a>
+          <a href="practica.html" class="btn btn-sm btn-outline-secondary w-100" style="font-size:.75rem">
+            <i class="fas fa-code me-1"></i> Práctica
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="col-lg-10 py-4 px-4">
+
+      <!-- ===================================================== -->
+      <!-- S1: ¿Qué es la POO?                                   -->
+      <!-- ===================================================== -->
+      <div id="s1" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">1</span>
+          ¿Qué es la Programación Orientada a Objetos?
+        </h2>
+        <p class="text-muted mb-4">Del código espagueti al código organizado</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="compare-bad p-3">
+              <div class="fw-bold text-danger mb-2">😞 Código procedural (spaghetti)</div>
+              <pre style="background:transparent;padding:0;border:none;font-size:.8rem"><span class="cmt">// 500 líneas en un archivo...</span>
+<span class="kw">$nombre_guerrero</span> = <span class="str">'Aragorn'</span>;
+<span class="kw">$vida_guerrero</span>   = <span class="num">150</span>;
+<span class="kw">$fuerza_guerrero</span> = <span class="num">30</span>;
+<span class="kw">$nombre_mago</span>     = <span class="str">'Gandalf'</span>;
+<span class="kw">$vida_mago</span>       = <span class="num">80</span>;
+<span class="kw">$mana_mago</span>       = <span class="num">100</span>;
+
+<span class="kw">function</span> <span class="fn">atacar_guerrero</span>(<span class="kw">$fuerza</span>, &<span class="kw">$vida_obj</span>) {
+    <span class="kw">$vida_obj</span> -= <span class="kw">$fuerza</span> + <span class="fn">rand</span>(<span class="num">0</span>,<span class="num">10</span>);
+}
+<span class="kw">function</span> <span class="fn">atacar_mago</span>(<span class="kw">$fuerza</span>, &<span class="kw">$mana</span>, &<span class="kw">$vida_obj</span>) {
+    <span class="cmt">// diferente lógica mezclada aquí...</span>
+}</pre>
+              <div class="mt-2 text-danger small">Datos y funciones dispersos. Difícil de mantener.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="compare-good p-3">
+              <div class="fw-bold text-success mb-2">✅ Código orientado a objetos</div>
+              <pre style="background:transparent;padding:0;border:none;font-size:.8rem"><span class="cmt">// Cada personaje es un OBJETO autocontenido</span>
+<span class="kw">$guerrero</span> = <span class="kw">new</span> <span class="cls">Guerrero</span>(<span class="str">'Aragorn'</span>);
+<span class="kw">$mago</span>     = <span class="kw">new</span> <span class="cls">Mago</span>(<span class="str">'Gandalf'</span>);
+
+<span class="cmt">// Cada objeto sabe cómo atacar</span>
+<span class="kw">$guerrero</span>-><span class="fn">atacar</span>(<span class="kw">$mago</span>);
+<span class="kw">$mago</span>-><span class="fn">atacar</span>(<span class="kw">$guerrero</span>);
+
+<span class="cmt">// Los datos están DENTRO del objeto</span>
+<span class="fn">echo</span> <span class="kw">$mago</span>-><span class="fn">getVida</span>();  <span class="cmt">// acceso controlado</span>
+<span class="fn">echo</span> <span class="kw">$guerrero</span>;        <span class="cmt">// __toString</span></pre>
+              <div class="mt-2 text-success small">Datos y comportamiento juntos. Legible y extensible.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-info p-3 mt-4">
+          <strong style="color:var(--poo)">Definición:</strong>
+          La POO es un paradigma de programación que organiza el código en <strong>objetos</strong>
+          — entidades que encapsulan <em>estado</em> (datos) y <em>comportamiento</em> (métodos).
+          Una <strong>clase</strong> es el molde; un <strong>objeto</strong> es la instancia real.
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S2: Clase y Objeto                                     -->
+      <!-- ===================================================== -->
+      <div id="s2" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">2</span>
+          Clase y Objeto — el molde y la instancia
+        </h2>
+        <p class="text-muted mb-4">La clase es el plano, el objeto es la casa construida</p>
+
+        <div class="row g-4 align-items-start">
+          <div class="col-md-5">
+            <div class="p-3 text-center rounded" style="background:#f5f3ff; border:2px dashed #c4b5fd">
+              <div style="font-size:3rem">📋</div>
+              <div class="fw-bold mt-1" style="color:var(--poo)">Clase = Molde</div>
+              <div class="text-muted small">Define la ESTRUCTURA. No ocupa memoria de "datos".</div>
+              <div class="mt-2 font-monospace small">class Perro { ... }</div>
+            </div>
+            <div class="text-center my-2" style="font-size:1.5rem">↓ new</div>
+            <div class="p-3 text-center rounded" style="background:#f0fdf4; border:2px dashed #4ade80">
+              <div style="font-size:3rem">🐕</div>
+              <div class="fw-bold mt-1 text-success">Objeto = Instancia</div>
+              <div class="text-muted small">Un perro concreto con sus propios datos.</div>
+              <div class="mt-2 font-monospace small">$firulais = new Perro('Firulais')</div>
+            </div>
+          </div>
+          <div class="col-md-7">
+            <pre><span class="cmt">// ── DEFINIR la clase (el molde) ──────────────</span>
+<span class="kw">class</span> <span class="cls">Perro</span>
+{
+    <span class="cmt">// Propiedades: características del perro</span>
+    <span class="kw">public</span> <span class="cls">string</span> <span class="kw">$nombre</span>;
+    <span class="kw">public</span> <span class="cls">string</span> <span class="kw">$raza</span>;
+    <span class="kw">public</span> <span class="cls">int</span>    <span class="kw">$edad</span>;
+
+    <span class="cmt">// Método: comportamiento del perro</span>
+    <span class="kw">public function</span> <span class="fn">ladrar</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">nombre</span> . <span class="str">' dice: ¡Guau!'</span>;
+    }
+}
+
+<span class="cmt">// ── INSTANCIAR objetos (construir casas con el molde)</span>
+<span class="kw">$firulais</span>  = <span class="kw">new</span> <span class="cls">Perro</span>();
+<span class="kw">$firulais</span>-><span class="kw">nombre</span> = <span class="str">'Firulais'</span>;
+<span class="kw">$firulais</span>-><span class="kw">raza</span>   = <span class="str">'Labrador'</span>;
+<span class="kw">$firulais</span>-><span class="kw">edad</span>   = <span class="num">3</span>;
+
+<span class="kw">$rex</span>       = <span class="kw">new</span> <span class="cls">Perro</span>();
+<span class="kw">$rex</span>-><span class="kw">nombre</span> = <span class="str">'Rex'</span>;
+<span class="kw">$rex</span>-><span class="kw">raza</span>   = <span class="str">'Pastor Alemán'</span>;
+<span class="kw">$rex</span>-><span class="kw">edad</span>   = <span class="num">5</span>;
+
+<span class="cmt">// Cada objeto es INDEPENDIENTE</span>
+<span class="fn">echo</span> <span class="kw">$firulais</span>-><span class="fn">ladrar</span>(); <span class="cmt">// → Firulais dice: ¡Guau!</span>
+<span class="fn">echo</span> <span class="kw">$rex</span>-><span class="fn">ladrar</span>();      <span class="cmt">// → Rex dice: ¡Guau!</span>
+
+<span class="cmt">// $this → hace referencia al propio objeto</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S3: Constructor                                        -->
+      <!-- ===================================================== -->
+      <div id="s3" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">3</span>
+          Constructor — inicializar el objeto
+        </h2>
+        <p class="text-muted mb-4"><code class="i">__construct()</code> se llama automáticamente al hacer <code class="i">new</code></p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-bold">Constructor clásico</h5>
+            <pre><span class="kw">class</span> <span class="cls">Producto</span>
+{
+    <span class="kw">public</span> <span class="cls">string</span> <span class="kw">$nombre</span>;
+    <span class="kw">public</span> <span class="cls">float</span>  <span class="kw">$precio</span>;
+
+    <span class="cmt">// __construct se llama al hacer "new Producto(...)"</span>
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">string</span> <span class="kw">$nombre</span>, <span class="cls">float</span> <span class="kw">$precio</span>)
+    {
+        <span class="kw">$this</span>-><span class="kw">nombre</span> = <span class="kw">$nombre</span>;
+        <span class="kw">$this</span>-><span class="kw">precio</span> = <span class="kw">$precio</span>;
+    }
+}
+
+<span class="kw">$laptop</span> = <span class="kw">new</span> <span class="cls">Producto</span>(<span class="str">'Laptop'</span>, <span class="num">2899000</span>);
+<span class="fn">echo</span> <span class="kw">$laptop</span>-><span class="kw">nombre</span>; <span class="cmt">// → Laptop</span></pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">Constructor Promotion (PHP 8) ✨</h5>
+            <pre><span class="cmt">// PHP 8: el modificador en el parámetro
+// crea la propiedad Y la asigna automáticamente</span>
+<span class="kw">class</span> <span class="cls">Producto</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(
+        <span class="kw">public</span>  <span class="cls">string</span> <span class="kw">$nombre</span>,
+        <span class="kw">public</span>  <span class="cls">float</span>  <span class="kw">$precio</span>,
+        <span class="kw">private</span> <span class="cls">int</span>    <span class="kw">$stock</span> = <span class="num">0</span>   <span class="cmt">// valor por defecto</span>
+    ) {}
+    <span class="cmt">// ¡Sin código extra! PHP lo hace automáticamente.</span>
+}
+
+<span class="kw">$laptop</span> = <span class="kw">new</span> <span class="cls">Producto</span>(<span class="str">'Laptop'</span>, <span class="num">2899000</span>, <span class="num">10</span>);
+<span class="fn">echo</span> <span class="kw">$laptop</span>-><span class="kw">nombre</span>; <span class="cmt">// → Laptop</span></pre>
+          </div>
+        </div>
+
+        <div class="box-info p-3 mt-3">
+          <strong style="color:var(--poo)">Tip:</strong> Usa <strong>Constructor Promotion</strong> en proyectos modernos (PHP 8+).
+          Es más conciso y elimina código repetitivo.
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S4: Encapsulamiento                                    -->
+      <!-- ===================================================== -->
+      <div id="s4" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">4</span>
+          Encapsulamiento — controlar el acceso
+        </h2>
+        <p class="text-muted mb-4"><code class="i">public</code>, <code class="i">protected</code>, <code class="i">private</code></p>
+
+        <div class="table-responsive mb-4">
+          <table class="table table-bordered neat">
+            <thead>
+              <tr><th>Modificador</th><th>Desde la misma clase</th><th>Desde una clase hija</th><th>Desde fuera</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code class="i">public</code></td>   <td class="text-success">✓</td><td class="text-success">✓</td><td class="text-success">✓</td></tr>
+              <tr><td><code class="i">protected</code></td><td class="text-success">✓</td><td class="text-success">✓</td><td class="text-danger">✗</td></tr>
+              <tr><td><code class="i">private</code></td>  <td class="text-success">✓</td><td class="text-danger">✗</td><td class="text-danger">✗</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <pre><span class="kw">class</span> <span class="cls">CuentaBancaria</span>
+{
+    <span class="kw">private</span> <span class="cls">float</span> <span class="kw">$saldo</span> = <span class="num">0</span>;       <span class="cmt">// nadie accede directamente</span>
+    <span class="kw">public</span>  <span class="cls">string</span> <span class="kw">$titular</span>;         <span class="cmt">// todos pueden leerlo</span>
+
+    <span class="kw">public function</span> <span class="fn">depositar</span>(<span class="cls">float</span> <span class="kw">$monto</span>): <span class="cls">void</span>
+    {
+        <span class="kw">if</span> (<span class="kw">$monto</span> <= <span class="num">0</span>) <span class="kw">throw new</span> <span class="cls">InvalidArgumentException</span>(<span class="str">'Monto inválido'</span>);
+        <span class="kw">$this</span>-><span class="kw">saldo</span> += <span class="kw">$monto</span>;  <span class="cmt">// solo la clase modifica $saldo</span>
+    }
+
+    <span class="kw">public function</span> <span class="fn">getSaldo</span>(): <span class="cls">float</span>   <span class="cmt">// getter: solo lectura</span>
+    {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">saldo</span>;
+    }
+}
+
+<span class="kw">$cuenta</span> = <span class="kw">new</span> <span class="cls">CuentaBancaria</span>();
+<span class="kw">$cuenta</span>-><span class="fn">depositar</span>(<span class="num">1000</span>);
+<span class="fn">echo</span> <span class="kw">$cuenta</span>-><span class="fn">getSaldo</span>();    <span class="cmt">// → 1000  ✓</span>
+<span class="cmt">// $cuenta->saldo = 999999;  ← ERROR: propiedad privada</span></pre>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S5: Herencia                                           -->
+      <!-- ===================================================== -->
+      <div id="s5" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">5</span>
+          Herencia — reutilizar y extender
+        </h2>
+        <p class="text-muted mb-4"><code class="i">extends</code> · <code class="i">parent::</code> · sobrescribir métodos</p>
+
+        <pre><span class="kw">class</span> <span class="cls">Animal</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">protected</span> <span class="cls">string</span> <span class="kw">$nombre</span>) {}
+
+    <span class="kw">public function</span> <span class="fn">comer</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">nombre</span> . <span class="str">' está comiendo.'</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">hacerSonido</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="str">'...'</span>;   <span class="cmt">// genérico, las hijas lo sobreescriben</span>
+    }
+}
+
+<span class="cmt">// Perro HEREDA todo de Animal y AGREGA / SOBREESCRIBE</span>
+<span class="kw">class</span> <span class="cls">Perro</span> <span class="kw">extends</span> <span class="cls">Animal</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">string</span> <span class="kw">$nombre</span>, <span class="kw">private</span> <span class="cls">string</span> <span class="kw">$raza</span>)
+    {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>(<span class="kw">$nombre</span>);  <span class="cmt">// llama al constructor del padre</span>
+    }
+
+    <span class="cmt">// Sobreescribir un método del padre</span>
+    <span class="kw">public function</span> <span class="fn">hacerSonido</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">nombre</span> . <span class="str">' (' . $this->raza . '): ¡Guau!'</span>;
+    }
+
+    <span class="cmt">// Método propio (solo Perro lo tiene)</span>
+    <span class="kw">public function</span> <span class="fn">buscarPalo</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">nombre</span> . <span class="str">' trae el palo 🦴'</span>;
+    }
+}
+
+<span class="kw">$perro</span> = <span class="kw">new</span> <span class="cls">Perro</span>(<span class="str">'Rex'</span>, <span class="str">'Labrador'</span>);
+<span class="fn">echo</span> <span class="kw">$perro</span>-><span class="fn">comer</span>();       <span class="cmt">// heredado de Animal → "Rex está comiendo."</span>
+<span class="fn">echo</span> <span class="kw">$perro</span>-><span class="fn">hacerSonido</span>(); <span class="cmt">// sobreescrito → "Rex (Labrador): ¡Guau!"</span>
+<span class="fn">echo</span> <span class="kw">$perro</span>-><span class="fn">buscarPalo</span>();  <span class="cmt">// solo Perro → "Rex trae el palo 🦴"</span></pre>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S6: Clase Abstracta                                    -->
+      <!-- ===================================================== -->
+      <div id="s6" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">6</span>
+          Clase Abstracta — el molde incompleto
+        </h2>
+        <p class="text-muted mb-4"><code class="i">abstract class</code> · <code class="i">abstract method</code> · no instanciable directamente</p>
+
+        <div class="row g-4">
+          <div class="col-md-7">
+            <pre><span class="cmt">// Una clase abstracta:
+//   ✓ Puede tener métodos concretos
+//   ✓ Puede tener métodos abstractos (sin cuerpo)
+//   ✗ NO se puede instanciar con "new"</span>
+
+<span class="kw2">abstract</span> <span class="kw">class</span> <span class="cls">Figura</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">protected</span> <span class="cls">string</span> <span class="kw">$color</span>) {}
+
+    <span class="cmt">// Método ABSTRACTO: las hijas DEBEN implementarlo</span>
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">area</span>(): <span class="cls">float</span>;
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">perimetro</span>(): <span class="cls">float</span>;
+
+    <span class="cmt">// Método CONCRETO: compartido por todas las hijas</span>
+    <span class="kw">public function</span> <span class="fn">describir</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="fn">sprintf</span>(
+            <span class="str">'Figura %s: área=%.2f, perímetro=%.2f'</span>,
+            <span class="kw">$this</span>-><span class="kw">color</span>, <span class="kw">$this</span>-><span class="fn">area</span>(), <span class="kw">$this</span>-><span class="fn">perimetro</span>()
+        );
+    }
+}
+
+<span class="kw">class</span> <span class="cls">Circulo</span> <span class="kw">extends</span> <span class="cls">Figura</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">string</span> <span class="kw">$color</span>, <span class="kw">private</span> <span class="cls">float</span> <span class="kw">$radio</span>)
+    {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>(<span class="kw">$color</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">area</span>(): <span class="cls">float</span>      { <span class="kw">return</span> <span class="cls">M_PI</span> * <span class="kw">$this</span>-><span class="kw">radio</span> ** <span class="num">2</span>; }
+    <span class="kw">public function</span> <span class="fn">perimetro</span>(): <span class="cls">float</span> { <span class="kw">return</span> <span class="num">2</span> * <span class="cls">M_PI</span> * <span class="kw">$this</span>-><span class="kw">radio</span>; }
+}
+
+<span class="kw">class</span> <span class="cls">Rectangulo</span> <span class="kw">extends</span> <span class="cls">Figura</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">string</span> <span class="kw">$color</span>,
+        <span class="kw">private</span> <span class="cls">float</span> <span class="kw">$ancho</span>, <span class="kw">private</span> <span class="cls">float</span> <span class="kw">$alto</span>)
+    {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>(<span class="kw">$color</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">area</span>(): <span class="cls">float</span>      { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">ancho</span> * <span class="kw">$this</span>-><span class="kw">alto</span>; }
+    <span class="kw">public function</span> <span class="fn">perimetro</span>(): <span class="cls">float</span> { <span class="kw">return</span> <span class="num">2</span> * (<span class="kw">$this</span>-><span class="kw">ancho</span> + <span class="kw">$this</span>-><span class="kw">alto</span>); }
+}
+
+<span class="cmt">// $figura = new Figura('rojo');  ← ERROR: clase abstracta</span>
+<span class="kw">$c</span> = <span class="kw">new</span> <span class="cls">Circulo</span>(<span class="str">'azul'</span>, <span class="num">5</span>);
+<span class="fn">echo</span> <span class="kw">$c</span>-><span class="fn">describir</span>();  <span class="cmt">// método HEREDADO usa area() sobreescrita</span></pre>
+          </div>
+          <div class="col-md-5">
+            <div class="box-info p-3 mb-3">
+              <strong style="color:var(--poo)">¿Cuándo usar clase abstracta?</strong>
+              <ul class="mt-2 mb-0 small text-muted">
+                <li>Cuando varias clases comparten código base</li>
+                <li>Cuando quieres OBLIGAR a las hijas a implementar ciertos métodos</li>
+                <li>Cuando el concepto padre no tiene sentido por sí solo (no tiene sentido un "Figura" genérica, sí un "Círculo")</li>
+              </ul>
+            </div>
+            <div class="box-warning p-3">
+              <strong style="color:#b45309">Diferencia con Interface:</strong>
+              <ul class="mt-2 mb-0 small text-muted">
+                <li>La clase abstracta <em>puede</em> tener código concreto</li>
+                <li>Solo se puede <em>extender una</em> clase abstracta</li>
+                <li>La interface solo declara firmas</li>
+                <li>Una clase puede <em>implementar varias</em> interfaces</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S7: Interface                                          -->
+      <!-- ===================================================== -->
+      <div id="s7" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">7</span>
+          Interface — el contrato
+        </h2>
+        <p class="text-muted mb-4"><code class="i">interface</code> · <code class="i">implements</code> · múltiples interfaces</p>
+
+        <pre><span class="cmt">// Una interface define un CONTRATO: qué métodos debe tener la clase.
+// No importa CÓMO los implementa — solo que EXISTEN.</span>
+
+<span class="kw2">interface</span> <span class="cls">Exportable</span>
+{
+    <span class="kw">public function</span> <span class="fn">exportarCSV</span>(): <span class="cls">string</span>;
+    <span class="kw">public function</span> <span class="fn">exportarJSON</span>(): <span class="cls">string</span>;
+}
+
+<span class="kw2">interface</span> <span class="cls">Imprimible</span>
+{
+    <span class="kw">public function</span> <span class="fn">imprimir</span>(): <span class="cls">void</span>;
+}
+
+<span class="cmt">// Una clase puede implementar VARIAS interfaces</span>
+<span class="kw">class</span> <span class="cls">Reporte</span> <span class="kw">implements</span> <span class="cls">Exportable</span>, <span class="cls">Imprimible</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">private</span> <span class="cls">array</span> <span class="kw">$datos</span>) {}
+
+    <span class="kw">public function</span> <span class="fn">exportarCSV</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="fn">implode</span>(<span class="str">','</span>, <span class="kw">$this</span>-><span class="kw">datos</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">exportarJSON</span>(): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="fn">json_encode</span>(<span class="kw">$this</span>-><span class="kw">datos</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">imprimir</span>(): <span class="cls">void</span>
+    {
+        <span class="fn">echo</span> <span class="str">'Imprimiendo: '</span> . <span class="kw">$this</span>-><span class="fn">exportarCSV</span>();
+    }
+}
+
+<span class="kw">$r</span> = <span class="kw">new</span> <span class="cls">Reporte</span>([<span class="str">'Ana'</span>, <span class="str">'Carlos'</span>, <span class="str">'María'</span>]);
+<span class="fn">echo</span> <span class="kw">$r</span>-><span class="fn">exportarJSON</span>(); <span class="cmt">// → ["Ana","Carlos","María"]</span>
+
+<span class="cmt">// Type hinting con interface</span>
+<span class="kw">function</span> <span class="fn">enviarAlServidor</span>(<span class="cls">Exportable</span> <span class="kw">$elemento</span>): <span class="cls">void</span>
+{
+    <span class="fn">echo</span> <span class="kw">$elemento</span>-><span class="fn">exportarJSON</span>(); <span class="cmt">// funciona con cualquier Exportable</span>
+}</pre>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S8: Polimorfismo                                       -->
+      <!-- ===================================================== -->
+      <div id="s8" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">8</span>
+          Polimorfismo — mismo mensaje, diferente respuesta
+        </h2>
+        <p class="text-muted mb-4">Griego: <em>polys</em> (muchos) + <em>morphe</em> (forma)</p>
+
+        <pre><span class="kw2">abstract</span> <span class="kw">class</span> <span class="cls">Empleado</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">protected</span> <span class="cls">string</span> <span class="kw">$nombre</span>) {}
+    <span class="kw2">abstract</span> <span class="kw">public function</span> <span class="fn">calcularSalario</span>(): <span class="cls">float</span>;
+    <span class="kw">public function</span> <span class="fn">getNombre</span>(): <span class="cls">string</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">nombre</span>; }
+}
+
+<span class="kw">class</span> <span class="cls">EmpleadoFijo</span> <span class="kw">extends</span> <span class="cls">Empleado</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">string</span> <span class="kw">$nombre</span>, <span class="kw">private</span> <span class="cls">float</span> <span class="kw">$salarioBase</span>) {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>(<span class="kw">$nombre</span>);
+    }
+    <span class="kw">public function</span> <span class="fn">calcularSalario</span>(): <span class="cls">float</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">salarioBase</span>; }
+}
+
+<span class="kw">class</span> <span class="cls">EmpleadoPorHoras</span> <span class="kw">extends</span> <span class="cls">Empleado</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">string</span> <span class="kw">$nombre</span>,
+        <span class="kw">private</span> <span class="cls">float</span> <span class="kw">$valorHora</span>, <span class="kw">private</span> <span class="cls">int</span> <span class="kw">$horas</span>) {
+        <span class="kw">parent</span>::<span class="fn">__construct</span>(<span class="kw">$nombre</span>);
+    }
+    <span class="kw">public function</span> <span class="fn">calcularSalario</span>(): <span class="cls">float</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">valorHora</span> * <span class="kw">$this</span>-><span class="kw">horas</span>; }
+}
+
+<span class="cmt">// POLIMORFISMO: todos son Empleado → mismo método calcularSalario()</span>
+<span class="kw">$nomina</span> = [
+    <span class="kw">new</span> <span class="cls">EmpleadoFijo</span>(<span class="str">'Ana'</span>, <span class="num">3500000</span>),
+    <span class="kw">new</span> <span class="cls">EmpleadoPorHoras</span>(<span class="str">'Carlos'</span>, <span class="num">25000</span>, <span class="num">160</span>),
+    <span class="kw">new</span> <span class="cls">EmpleadoFijo</span>(<span class="str">'María'</span>, <span class="num">4200000</span>),
+];
+
+<span class="kw">$totalNomina</span> = <span class="num">0</span>;
+<span class="kw">foreach</span> (<span class="kw">$nomina</span> <span class="kw">as</span> <span class="kw">$emp</span>) {
+    <span class="kw">$salario</span> = <span class="kw">$emp</span>-><span class="fn">calcularSalario</span>(); <span class="cmt">// PHP decide cuál usar según el tipo real</span>
+    <span class="fn">echo</span> <span class="kw">$emp</span>-><span class="fn">getNombre</span>() . <span class="str">': $'</span> . <span class="kw">$salario</span>;
+    <span class="kw">$totalNomina</span> += <span class="kw">$salario</span>;
+}
+<span class="fn">echo</span> <span class="str">'Total nómina: $'</span> . <span class="kw">$totalNomina</span>;</pre>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S9: Static                                             -->
+      <!-- ===================================================== -->
+      <div id="s9" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">9</span>
+          Propiedades y métodos estáticos
+        </h2>
+        <p class="text-muted mb-4"><code class="i">static</code> · <code class="i">self::</code> · <code class="i">Clase::método()</code> sin instanciar</p>
+
+        <pre><span class="kw">class</span> <span class="cls">Contador</span>
+{
+    <span class="cmt">// Pertenece a la CLASE, no a una instancia</span>
+    <span class="kw">private static</span> <span class="cls">int</span> <span class="kw">$instancias</span> = <span class="num">0</span>;
+
+    <span class="kw">public function</span> <span class="fn">__construct</span>()
+    {
+        <span class="kw">self</span>::<span class="kw">$instancias</span>++;   <span class="cmt">// self:: para acceder a static en la misma clase</span>
+    }
+
+    <span class="kw">public static function</span> <span class="fn">getInstancias</span>(): <span class="cls">int</span>
+    {
+        <span class="kw">return</span> <span class="kw">self</span>::<span class="kw">$instancias</span>;
+    }
+
+    <span class="cmt">// Método utilitario estático (no necesita instancia)</span>
+    <span class="kw">public static function</span> <span class="fn">formatearPrecio</span>(<span class="cls">float</span> <span class="kw">$precio</span>): <span class="cls">string</span>
+    {
+        <span class="kw">return</span> <span class="str">'$'</span> . <span class="fn">number_format</span>(<span class="kw">$precio</span>, <span class="num">0</span>, <span class="str">','</span>, <span class="str">'.'</span>);
+    }
+}
+
+<span class="kw">$a</span> = <span class="kw">new</span> <span class="cls">Contador</span>();
+<span class="kw">$b</span> = <span class="kw">new</span> <span class="cls">Contador</span>();
+<span class="kw">$c</span> = <span class="kw">new</span> <span class="cls">Contador</span>();
+
+<span class="fn">echo</span> <span class="cls">Contador</span>::<span class="fn">getInstancias</span>();     <span class="cmt">// → 3  (sin necesidad de objeto)</span>
+<span class="fn">echo</span> <span class="cls">Contador</span>::<span class="fn">formatearPrecio</span>(<span class="num">1500000</span>); <span class="cmt">// → $1.500.000</span></pre>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S10: Traits                                            -->
+      <!-- ===================================================== -->
+      <div id="s10" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">10</span>
+          Traits — reutilizar código horizontal
+        </h2>
+        <p class="text-muted mb-4">Como un "mixin": agrega métodos a cualquier clase sin herencia</p>
+
+        <pre><span class="cmt">// Un trait define métodos reutilizables
+// Se "inyectan" en la clase con "use"</span>
+
+<span class="kw2">trait</span> <span class="cls">Timestampable</span>
+{
+    <span class="kw">private</span> <span class="cls">string</span> <span class="kw">$creadoEn</span>;
+    <span class="kw">private</span> <span class="cls">string</span> <span class="kw">$actualizadoEn</span>;
+
+    <span class="kw">public function</span> <span class="fn">marcarCreado</span>(): <span class="cls">void</span>
+    {
+        <span class="kw">$this</span>-><span class="kw">creadoEn</span> = <span class="fn">date</span>(<span class="str">'Y-m-d H:i:s'</span>);
+    }
+
+    <span class="kw">public function</span> <span class="fn">getCreadoEn</span>(): <span class="cls">string</span>  { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">creadoEn</span>; }
+}
+
+<span class="kw2">trait</span> <span class="cls">Loggable</span>
+{
+    <span class="kw">private</span> <span class="cls">array</span> <span class="kw">$log</span> = [];
+
+    <span class="kw">public function</span> <span class="fn">registrar</span>(<span class="cls">string</span> <span class="kw">$msg</span>): <span class="cls">void</span>
+    {
+        <span class="kw">$this</span>-><span class="kw">log</span>[] = <span class="fn">date</span>(<span class="str">'H:i:s'</span>) . <span class="str">': '</span> . <span class="kw">$msg</span>;
+    }
+
+    <span class="kw">public function</span> <span class="fn">getLog</span>(): <span class="cls">array</span> { <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">log</span>; }
+}
+
+<span class="kw">class</span> <span class="cls">Usuario</span>
+{
+    <span class="cmt">// ¡Usa AMBOS traits! Imposible con herencia múltiple.</span>
+    <span class="kw">use</span> <span class="cls">Timestampable</span>, <span class="cls">Loggable</span>;
+
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="kw">public</span> <span class="cls">string</span> <span class="kw">$nombre</span>)
+    {
+        <span class="kw">$this</span>-><span class="fn">marcarCreado</span>();
+        <span class="kw">$this</span>-><span class="fn">registrar</span>(<span class="str">'Usuario creado: '</span> . <span class="kw">$nombre</span>);
+    }
+}
+
+<span class="kw">$u</span> = <span class="kw">new</span> <span class="cls">Usuario</span>(<span class="str">'Ana García'</span>);
+<span class="fn">echo</span> <span class="kw">$u</span>-><span class="fn">getCreadoEn</span>();         <span class="cmt">// del Timestampable</span>
+<span class="fn">print_r</span>(<span class="kw">$u</span>-><span class="fn">getLog</span>());          <span class="cmt">// del Loggable</span></pre>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S11: Magic Methods                                     -->
+      <!-- ===================================================== -->
+      <div id="s11" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">11</span>
+          Magic Methods — la magia de PHP
+        </h2>
+        <p class="text-muted mb-4">Métodos que PHP llama automáticamente en ciertos eventos</p>
+
+        <pre><span class="kw">class</span> <span class="cls">Coleccion</span>
+{
+    <span class="kw">private</span> <span class="cls">array</span> <span class="kw">$items</span> = [];
+
+    <span class="cmt">// __construct: al hacer new Coleccion()</span>
+    <span class="kw">public function</span> <span class="fn">__construct</span>(<span class="cls">array</span> <span class="kw">$items</span> = []) {
+        <span class="kw">$this</span>-><span class="kw">items</span> = <span class="kw">$items</span>;
+    }
+
+    <span class="cmt">// __toString: al hacer echo $coleccion o (string)$coleccion</span>
+    <span class="kw">public function</span> <span class="fn">__toString</span>(): <span class="cls">string</span> {
+        <span class="kw">return</span> <span class="str">'Colección['</span> . <span class="fn">count</span>(<span class="kw">$this</span>-><span class="kw">items</span>) . <span class="str">' elementos]'</span>;
+    }
+
+    <span class="cmt">// __get: al leer una propiedad que no existe</span>
+    <span class="kw">public function</span> <span class="fn">__get</span>(<span class="cls">string</span> <span class="kw">$nombre</span>): <span class="cls">mixed</span> {
+        <span class="kw">return</span> <span class="kw">$this</span>-><span class="kw">items</span>[<span class="kw">$nombre</span>] ?? <span class="kw">null</span>;
+    }
+
+    <span class="cmt">// __set: al escribir una propiedad que no existe</span>
+    <span class="kw">public function</span> <span class="fn">__set</span>(<span class="cls">string</span> <span class="kw">$nombre</span>, <span class="cls">mixed</span> <span class="kw">$valor</span>): <span class="cls">void</span> {
+        <span class="kw">$this</span>-><span class="kw">items</span>[<span class="kw">$nombre</span>] = <span class="kw">$valor</span>;
+    }
+
+    <span class="cmt">// __isset: al hacer isset($coleccion->algo)</span>
+    <span class="kw">public function</span> <span class="fn">__isset</span>(<span class="cls">string</span> <span class="kw">$nombre</span>): <span class="cls">bool</span> {
+        <span class="kw">return</span> <span class="fn">isset</span>(<span class="kw">$this</span>-><span class="kw">items</span>[<span class="kw">$nombre</span>]);
+    }
+
+    <span class="cmt">// __destruct: al destruir el objeto (fin de script o unset())</span>
+    <span class="kw">public function</span> <span class="fn">__destruct</span>() {
+        <span class="cmt">// Bueno para cerrar conexiones, limpiar recursos...</span>
+    }
+}
+
+<span class="kw">$c</span> = <span class="kw">new</span> <span class="cls">Coleccion</span>([<span class="str">'color'</span> => <span class="str">'azul'</span>]);
+<span class="fn">echo</span> <span class="kw">$c</span>;               <span class="cmt">// → "Colección[1 elementos]"  via __toString</span>
+<span class="fn">echo</span> <span class="kw">$c</span>-><span class="kw">color</span>;        <span class="cmt">// → "azul"  via __get</span>
+<span class="kw">$c</span>-><span class="kw">forma</span> = <span class="str">'cuadrado'</span>; <span class="cmt">// via __set</span>
+<span class="fn">echo</span> <span class="fn">isset</span>(<span class="kw">$c</span>-><span class="kw">forma</span>); <span class="cmt">// → true  via __isset</span></pre>
+
+        <div class="row g-2 mt-2" style="font-size:.82rem">
+          <div class="col-md-3"><div class="p-2 rounded" style="background:#f5f3ff;border:1px solid #c4b5fd"><code class="i">__construct</code><br><span class="text-muted">Al hacer new</span></div></div>
+          <div class="col-md-3"><div class="p-2 rounded" style="background:#f5f3ff;border:1px solid #c4b5fd"><code class="i">__toString</code><br><span class="text-muted">Al usar como string</span></div></div>
+          <div class="col-md-3"><div class="p-2 rounded" style="background:#f5f3ff;border:1px solid #c4b5fd"><code class="i">__get / __set</code><br><span class="text-muted">Propiedad dinámica</span></div></div>
+          <div class="col-md-3"><div class="p-2 rounded" style="background:#f5f3ff;border:1px solid #c4b5fd"><code class="i">__destruct</code><br><span class="text-muted">Al destruir el objeto</span></div></div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S12: PHP 8                                             -->
+      <!-- ===================================================== -->
+      <div id="s12" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">12</span>
+          PHP 8 — Novedades en POO
+        </h2>
+        <p class="text-muted mb-4">Constructor Promotion · Readonly · Enums · Named Arguments</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-bold">Readonly Properties (PHP 8.1)</h5>
+            <pre><span class="kw">class</span> <span class="cls">Punto</span>
+{
+    <span class="kw">public function</span> <span class="fn">__construct</span>(
+        <span class="kw">public</span> <span class="kw2">readonly</span> <span class="cls">float</span> <span class="kw">$x</span>,
+        <span class="kw">public</span> <span class="kw2">readonly</span> <span class="cls">float</span> <span class="kw">$y</span>
+    ) {}
+}
+
+<span class="kw">$p</span> = <span class="kw">new</span> <span class="cls">Punto</span>(<span class="num">3.0</span>, <span class="num">4.0</span>);
+<span class="fn">echo</span> <span class="kw">$p</span>-><span class="kw">x</span>;    <span class="cmt">// → 3.0  ✓</span>
+<span class="cmt">// $p->x = 5; ← ERROR: readonly no se puede modificar</span></pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">Enums (PHP 8.1)</h5>
+            <pre><span class="kw2">enum</span> <span class="cls">Estado</span>
+{
+    case Activo;
+    case Inactivo;
+    case Suspendido;
+}
+
+<span class="kw2">enum</span> <span class="cls">Color</span>: <span class="cls">string</span>   <span class="cmt">// Backed Enum</span>
+{
+    case Rojo  = <span class="str">'red'</span>;
+    case Azul  = <span class="str">'blue'</span>;
+    case Verde = <span class="str">'green'</span>;
+}
+
+<span class="kw">$e</span> = <span class="cls">Estado</span>::Activo;
+<span class="kw">$c</span> = <span class="cls">Color</span>::Rojo;
+<span class="fn">echo</span> <span class="kw">$c</span>-><span class="kw">value</span>;  <span class="cmt">// → 'red'</span></pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">Named Arguments (PHP 8.0)</h5>
+            <pre><span class="kw">function</span> <span class="fn">crearPersonaje</span>(
+    <span class="cls">string</span> <span class="kw">$nombre</span>,
+    <span class="cls">int</span>    <span class="kw">$vida</span>   = <span class="num">100</span>,
+    <span class="cls">string</span> <span class="kw">$clase</span>  = <span class="str">'guerrero'</span>
+): <span class="cls">array</span> {
+    <span class="kw">return</span> <span class="fn">compact</span>(<span class="str">'nombre'</span>,<span class="str">'vida'</span>,<span class="str">'clase'</span>);
+}
+
+<span class="cmt">// Named: puedes omitir parámetros intermedios</span>
+<span class="fn">crearPersonaje</span>(<span class="kw">nombre</span>: <span class="str">'Ana'</span>, <span class="kw">clase</span>: <span class="str">'mago'</span>);
+<span class="cmt">// → ['nombre'=>'Ana', 'vida'=>100, 'clase'=>'mago']</span></pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">Match Expression (PHP 8.0)</h5>
+            <pre><span class="kw">$tipo</span> = <span class="str">'guerrero'</span>;
+
+<span class="cmt">// match es más seguro que switch</span>
+<span class="kw">$clase</span> = <span class="kw">match</span>(<span class="kw">$tipo</span>) {
+    <span class="str">'guerrero'</span> => <span class="kw">new</span> <span class="cls">Guerrero</span>(<span class="str">'Aragorn'</span>),
+    <span class="str">'mago'</span>     => <span class="kw">new</span> <span class="cls">Mago</span>(<span class="str">'Gandalf'</span>),
+    <span class="str">'arquero'</span>  => <span class="kw">new</span> <span class="cls">Arquero</span>(<span class="str">'Legolas'</span>),
+    <span class="kw">default</span>    => <span class="kw">throw new</span> <span class="cls">ValueError</span>(<span class="str">'Clase desconocida'</span>),
+};</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===================================================== -->
+      <!-- S13: Resumen                                           -->
+      <!-- ===================================================== -->
+      <div id="s13" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-poo me-2">13</span>
+          Resumen — ¿Cuándo usar qué?
+        </h2>
+
+        <div class="table-responsive">
+          <table class="table table-bordered neat">
+            <thead>
+              <tr><th>Concepto</th><th>Cuándo usar</th><th>Sintaxis clave</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>class</strong></td><td>Siempre que agrupe datos + comportamiento</td><td><code class="i">class Nombre { }</code></td></tr>
+              <tr><td><strong>extends</strong></td><td>Cuando B es un tipo de A (Perro es Animal)</td><td><code class="i">class B extends A { }</code></td></tr>
+              <tr><td><strong>abstract class</strong></td><td>Clase base con código común + métodos a obligar</td><td><code class="i">abstract class A { abstract public function f(); }</code></td></tr>
+              <tr><td><strong>interface</strong></td><td>Contrato de capacidades (puede implementar varias)</td><td><code class="i">interface I { } · implements I</code></td></tr>
+              <tr><td><strong>trait</strong></td><td>Reutilizar código en clases sin relación de herencia</td><td><code class="i">trait T { } · use T</code></td></tr>
+              <tr><td><strong>static</strong></td><td>Datos/comportamiento de la clase (no de instancias)</td><td><code class="i">static $var · Clase::metodo()</code></td></tr>
+              <tr><td><strong>readonly</strong></td><td>Propiedad que no cambia después del constructor</td><td><code class="i">public readonly string $nombre</code></td></tr>
+              <tr><td><strong>enum</strong></td><td>Conjunto finito de valores posibles</td><td><code class="i">enum Estado { case Activo; }</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="mt-4 p-4 rounded text-center" style="background:#0f0c1a; border:2px solid var(--poo)">
+          <h4 class="fw-bold mb-3" style="color:var(--poo2)">¿Listo para el combate?</h4>
+          <p style="color:#94a3b8" class="mb-3">Explora la demo RPG y luego completa los 30 TODOs de la práctica.</p>
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="demo/index.php" class="btn" style="background:var(--poo);color:#fff">
+              <i class="fas fa-dragon me-1"></i> Demo Arena RPG
+            </a>
+            <a href="practica.html" class="btn btn-outline-warning">
+              <i class="fas fa-keyboard me-1"></i> Práctica de Vehículos
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col -->
+  </div><!-- /row -->
+</div><!-- /container -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const sections = document.querySelectorAll('.section');
+const links    = document.querySelectorAll('.nav-link-side');
+const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = document.querySelector(`.nav-link-side[href="#${e.target.id}"]`);
+            if (a) a.classList.add('active');
+        }
+    });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>

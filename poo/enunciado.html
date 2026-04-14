@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enunciado POO PHP — SENA 3066552</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --poo:#7c3aed; --poo2:#f59e0b; }
+    body { background:#f8f9fa; font-family:'Segoe UI',sans-serif; }
+    .hero { background:linear-gradient(135deg,#0f0c1a,#1a1033); color:#e2e8f0; }
+    .section-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.08); }
+    .pts { background:#1e2a35; color:#56d1f0; border-radius:8px; padding:2px 10px; font-size:.8rem; font-weight:700; }
+    code.i { background:#1e2a35; color:#a78bfa; padding:2px 6px; border-radius:4px; font-size:.88em; }
+    .task-num { width:32px; height:32px; border-radius:50%; background:var(--poo); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.9rem; flex-shrink:0; }
+    .uml-box { background:#0d0a1a; color:#e2e8f0; border-radius:10px; font-family:monospace; font-size:.82rem; padding:1.2rem; line-height:1.9; }
+    .url-check { background:#0d1117; color:#56d157; border-radius:8px; font-family:monospace; font-size:.82rem; padding:6px 12px; display:block; margin:3px 0; }
+  </style>
+</head>
+<body>
+
+<section class="hero py-5">
+  <div class="container py-2">
+    <a href="index.html" class="text-secondary text-decoration-none small mb-3 d-inline-block">
+      <i class="fas fa-arrow-left me-1"></i> Módulo POO
+    </a>
+    <div class="d-flex gap-2 mb-3">
+      <span class="badge" style="background:var(--poo)"><i class="fas fa-cube me-1"></i>POO en PHP</span>
+      <span class="badge bg-secondary">Práctica obligatoria</span>
+    </div>
+    <h1 class="fw-bold display-5 mb-2">Sistema de Flota Vehicular</h1>
+    <p class="lead mb-0" style="color:#adbac7">
+      Construye una jerarquía de clases PHP con herencia, polimorfismo, interface y clase abstracta.
+    </p>
+    <div class="mt-3 d-flex gap-3 flex-wrap" style="font-size:.85rem;color:#adbac7">
+      <span><i class="fas fa-cube me-1" style="color:var(--poo)"></i> POO pura (sin BD)</span>
+      <span><i class="fas fa-sitemap me-1" style="color:#56d157"></i> Herencia y polimorfismo</span>
+      <span><i class="fas fa-file-contract me-1" style="color:var(--poo2)"></i> Interface</span>
+      <span><i class="fas fa-star me-1" style="color:#fca5a5"></i> 100 puntos</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4">
+    <div class="col-lg-8">
+
+      <!-- QUÉ CONSTRUIR -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-bullseye me-2" style="color:var(--poo)"></i>¿Qué construir?</h2>
+        <p>
+          Una mini-aplicación web que modele la flota de una empresa de transporte.
+          La app muestra los vehículos en tarjetas Bootstrap, permite ver el detalle de
+          cada tipo y calcula el combustible necesario para diferentes rutas.
+          <strong>Sin base de datos</strong> — todo el foco está en la POO.
+        </p>
+        <div class="row g-3 mt-2">
+          <div class="col-sm-4">
+            <div class="p-3 rounded text-center" style="background:#dbeafe; border:1px solid #93c5fd">
+              <i class="fas fa-car fa-2x" style="color:#3b82f6"></i>
+              <div class="fw-bold mt-2">Auto</div>
+              <div class="text-muted small">4 o 2 puertas, gasta 8.5 L/100km</div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="p-3 rounded text-center" style="background:#fef3c7; border:1px solid #fcd34d">
+              <i class="fas fa-motorcycle fa-2x" style="color:#f59e0b"></i>
+              <div class="fw-bold mt-2">Moto</div>
+              <div class="text-muted small">cilindrada variable, gasta 4 L/100km</div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="p-3 rounded text-center" style="background:#fee2e2; border:1px solid #fca5a5">
+              <i class="fas fa-truck fa-2x" style="color:#e74c3c"></i>
+              <div class="fw-bold mt-2">Camión</div>
+              <div class="text-muted small">hasta 30T de carga, gasta 28 L/100km</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DIAGRAMA UML -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-diagram-project me-2" style="color:var(--poo)"></i>Diagrama de clases (UML simplificado)</h2>
+        <div class="uml-box">
+          <div style="color:#64748b">«interface»</div>
+          <div><span style="color:#a78bfa;font-weight:700">Conducible</span></div>
+          <div style="color:#64748b">  + arrancar(): string</div>
+          <div style="color:#64748b">  + frenar(): string</div>
+          <div style="color:#64748b">  + calcularCombustible(km): float</div>
+          <div style="color:#94a3b8">        ↑ implements</div>
+          <div style="color:#64748b">«abstract»</div>
+          <div><span style="color:#f59e0b;font-weight:700">Vehiculo</span> <span style="color:#64748b">(abstract)</span></div>
+          <div style="color:#64748b">  # marca, modelo, anio, precio</div>
+          <div style="color:#64748b">  + getTipo(): string  ← abstract</div>
+          <div style="color:#64748b">  + getIcono(): string ← abstract</div>
+          <div style="color:#64748b">  + getColor(): string ← abstract</div>
+          <div style="color:#64748b">  + consumoPor100km(): float ← abstract</div>
+          <div style="color:#64748b">  + calcularCombustible(km): float ← implementado</div>
+          <div style="color:#64748b">  + getContador(): int ← static</div>
+          <div style="color:#64748b">  + __toString(): string</div>
+          <div style="color:#94a3b8">    ┌────↑──────┬──────┐</div>
+          <div>
+            <span style="color:#3b82f6;font-weight:700">Auto</span>
+            <span style="color:#94a3b8">          </span>
+            <span style="color:#f59e0b;font-weight:700">Moto</span>
+            <span style="color:#94a3b8">         </span>
+            <span style="color:#e74c3c;font-weight:700">Camion</span>
+          </div>
+          <div style="color:#64748b">+puertas      +cilindrada    +capacidadTon</div>
+          <div style="color:#64748b">              +ejes</div>
+        </div>
+      </div>
+
+      <!-- TAREAS -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-list-check me-2" style="color:var(--poo)"></i>Tareas (30 TODOs)</h2>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">1</div>
+          <div>
+            <div class="fw-bold">Interface <code class="i">Conducible</code> <span class="pts">10 pts</span></div>
+            <div class="text-muted small">3 métodos: arrancar(), frenar(), calcularCombustible(). Sin cuerpo de método.</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">2</div>
+          <div>
+            <div class="fw-bold">Abstract class <code class="i">Vehiculo</code> <span class="pts">20 pts</span></div>
+            <div class="text-muted small">Constructor promotion, 4 métodos abstractos, calcularCombustible() concreto, static contador, __toString().</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">3</div>
+          <div>
+            <div class="fw-bold">Clases <code class="i">Auto</code>, <code class="i">Moto</code>, <code class="i">Camion</code> <span class="pts">25 pts</span></div>
+            <div class="text-muted small">Cada una extiende Vehiculo, tiene propiedad propia, implementa todos los métodos abstractos y los del contrato.</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">4</div>
+          <div>
+            <div class="fw-bold">Página de inicio <code class="i">index.php</code> <span class="pts">10 pts</span></div>
+            <div class="text-muted small">Instanciar 5+ vehículos, mostrar estadísticas y usar Vehiculo::getContador().</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">5</div>
+          <div>
+            <div class="fw-bold">Lista de flota <code class="i">pages/flota.php</code> <span class="pts">20 pts</span></div>
+            <div class="text-muted small">Grid de tarjetas mostrando todos los vehículos. Polimorfismo: mismos métodos en todos. Filtro por tipo (BONUS).</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">6</div>
+          <div>
+            <div class="fw-bold">Detalle + <code class="i">instanceof</code> <span class="pts">10 pts</span></div>
+            <div class="text-muted small">Ver un vehículo completo, tabla de combustible, campo específico según clase (instanceof).</div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">7</div>
+          <div>
+            <div class="fw-bold">Layout navbar + footer <span class="pts">5 pts</span></div>
+            <div class="text-muted small">Navegación funcional, badge de tecnología, footer con nombre de la empresa.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGLAS -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-gavel me-2" style="color:#56d157"></i>Reglas obligatorias</h2>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 rounded border border-success">
+              <div class="fw-bold text-success mb-1">✓ Siempre hacer</div>
+              <ul class="mb-0 small text-muted">
+                <li>Usar <code class="i">extends</code> correctamente (no duplicar código)</li>
+                <li>Llamar <code class="i">parent::__construct()</code> en cada hija</li>
+                <li>Usar <code class="i">instanceof</code> en vez de <code class="i">get_class()</code> para comparar</li>
+                <li>Escapar con <code class="i">htmlspecialchars()</code> al mostrar strings</li>
+                <li>Respetar visibilidad: <code class="i">private/protected/public</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded border border-danger">
+              <div class="fw-bold text-danger mb-1">✗ Nunca hacer</div>
+              <ul class="mb-0 small text-muted">
+                <li>Instanciar <code class="i">Vehiculo</code> directamente (es abstract)</li>
+                <li>Copiar el mismo método en Auto, Moto y Camion (para eso está la herencia)</li>
+                <li>Acceder a propiedades <code class="i">private</code> del padre desde la hija</li>
+                <li>Omitir el llamado a <code class="i">parent::__construct()</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-4">
+      <div class="section-card p-4 sticky-top" style="top:20px">
+        <h5 class="fw-bold mb-3">
+          <i class="fas fa-circle-check me-2" style="color:var(--poo)"></i>
+          URLs de verificación
+        </h5>
+        <span class="url-check">practica_app/index.php</span>
+        <span class="url-check">practica_app/pages/flota.php</span>
+        <span class="url-check">practica_app/pages/flota.php?tipo=auto</span>
+        <span class="url-check">practica_app/pages/detalle.php?tipo=auto</span>
+        <span class="url-check">practica_app/pages/detalle.php?tipo=moto</span>
+        <span class="url-check">practica_app/pages/detalle.php?tipo=camion</span>
+
+        <hr>
+
+        <h6 class="fw-bold mb-2">Distribución de puntos</h6>
+        <table class="table table-sm">
+          <tr><td>Interface Conducible</td><td class="text-end fw-bold">10</td></tr>
+          <tr><td>Abstract Vehiculo</td><td class="text-end fw-bold">20</td></tr>
+          <tr><td>Auto + Moto + Camion</td><td class="text-end fw-bold">25</td></tr>
+          <tr><td>index.php</td><td class="text-end fw-bold">10</td></tr>
+          <tr><td>Lista flota</td><td class="text-end fw-bold">20</td></tr>
+          <tr><td>Detalle + instanceof</td><td class="text-end fw-bold">10</td></tr>
+          <tr><td>Layout</td><td class="text-end fw-bold">5</td></tr>
+          <tr class="table-dark fw-bold"><td>Total</td><td class="text-end">100</td></tr>
+        </table>
+
+        <div class="mt-3 d-grid gap-2">
+          <a href="practica.html" class="btn btn-sm" style="background:var(--poo);color:#fff">
+            <i class="fas fa-keyboard me-1"></i> Guía con TODOs
+          </a>
+          <a href="demo/index.php" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-dragon me-1"></i> Ver demo RPG
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
