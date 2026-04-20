@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Práctica PHP + MySQL — SENA 3066552</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --db:#00758f; --db2:#f29111; }
+    body { background:#f8f9fa; font-family:'Segoe UI',sans-serif; }
+    .sidebar { position:sticky; top:70px; height:calc(100vh - 90px); overflow-y:auto; }
+    .nav-link-side { display:block; padding:6px 12px; border-radius:8px; font-size:.85rem; color:#495057; text-decoration:none; transition:background .15s; }
+    .nav-link-side:hover,.nav-link-side.active { background:#e3f2fd; color:var(--db); font-weight:600; }
+    .step-card { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07); padding:2rem; margin-bottom:2rem; scroll-margin-top:80px; }
+    .step-badge { width:36px; height:36px; border-radius:50%; background:var(--db); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; flex-shrink:0; }
+    pre { background:#0d1117; color:#e6edf3; border-radius:10px; padding:1.2rem; font-size:.83rem; overflow-x:auto; line-height:1.6; }
+    code.i { background:#1e2a35; color:#79c0ff; padding:2px 6px; border-radius:4px; font-size:.88em; }
+    .kw  { color:#ff7b72; } .str { color:#a5d6ff; } .cmt { color:#8b949e; }
+    .cls { color:#ffa657; } .fn  { color:#d2a8ff; } .num { color:#79c0ff; }
+    .todo-box { background:#1a1a2e; border:2px dashed var(--db); border-radius:12px; padding:1rem 1.2rem; margin:1rem 0; }
+    .todo-num { background:var(--db2); color:#fff; border-radius:4px; padding:2px 8px; font-size:.8rem; font-weight:700; margin-right:6px; }
+    .todo-title { font-weight:700; font-size:.95rem; }
+    .tip { background:#002a1a; border:1px solid #27ae60; border-radius:8px; padding:.8rem 1rem; margin:.6rem 0; font-size:.87rem; }
+    .warn { background:#2a1a00; border:1px solid #f29111; border-radius:8px; padding:.8rem 1rem; margin:.6rem 0; font-size:.87rem; }
+    .navbar { background:#0d1117 !important; border-bottom:2px solid var(--db); position:sticky; top:0; z-index:1030; }
+    .checklist li { padding:4px 0; }
+    .checklist li::marker { color:var(--db); }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-dark">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="index.html">
+      <i class="fas fa-database me-2" style="color:var(--db2)"></i>
+      PHP + MySQL — Guía de Práctica
+    </a>
+    <a href="teoria.html" class="btn btn-sm btn-outline-secondary text-light">
+      <i class="fas fa-book me-1"></i> Teoría
+    </a>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-2 d-none d-lg-block py-3 ps-3 pe-0">
+      <div class="sidebar">
+        <div class="small fw-bold text-muted text-uppercase px-2 mb-2" style="font-size:.68rem; letter-spacing:.08em">Pasos</div>
+        <a href="#p0" class="nav-link-side">0. Antes de empezar</a>
+        <a href="#p1" class="nav-link-side">1. Clase DB (TODOs 1)</a>
+        <a href="#p2" class="nav-link-side">2. Página de inicio (2-5)</a>
+        <a href="#p3" class="nav-link-side">3. Layout nav/footer (29-30)</a>
+        <a href="#p4" class="nav-link-side">4. Lista + filtros (6-12)</a>
+        <a href="#p5" class="nav-link-side">5. Ver detalle (13-15)</a>
+        <a href="#p6" class="nav-link-side">6. Crear INSERT (16-19)</a>
+        <a href="#p7" class="nav-link-side">7. Editar UPDATE (20-23)</a>
+        <a href="#p8" class="nav-link-side">8. Eliminar DELETE (24-27)</a>
+        <a href="#verificar" class="nav-link-side">✓ Verificar</a>
+
+        <div class="mt-3 px-2">
+          <a href="enunciado.html" class="btn btn-sm w-100 mb-1" style="background:var(--db);color:#fff;font-size:.75rem">
+            <i class="fas fa-file-alt me-1"></i> Enunciado
+          </a>
+          <a href="practica_app/" class="btn btn-sm btn-outline-secondary w-100" style="font-size:.75rem">
+            <i class="fas fa-folder-open me-1"></i> practica_app/
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO -->
+    <div class="col-lg-10 py-4 px-4">
+
+      <!-- Encabezado -->
+      <div class="mb-4">
+        <h1 class="fw-bold mb-1">
+          <i class="fas fa-keyboard me-2" style="color:var(--db2)"></i>
+          Agenda de Contactos — Guía de TODOs
+        </h1>
+        <p class="text-muted">
+          Completa los <code class="i">???</code> en los archivos de <code class="i">practica_app/</code>
+          siguiendo estos pasos. Hay <strong>27 TODOs</strong> en total.
+        </p>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 0: Antes de empezar                                      -->
+      <!-- ============================================================ -->
+      <div id="p0" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">0</div>
+          <h3 class="fw-bold mb-0">Antes de empezar</h3>
+        </div>
+
+        <h5 class="fw-bold">1. Crea la base de datos</h5>
+        <p>Abre phpMyAdmin → pestaña <strong>SQL</strong> → pega el contenido de:</p>
+        <code class="i">practica_app/sql/setup.sql</code>
+        <p class="mt-2">Verifica que apareció la BD <code class="i">sena_contactos</code> con 8 contactos.</p>
+
+        <h5 class="fw-bold mt-4">2. Estructura de archivos</h5>
+        <pre style="font-size:.8rem">practica_app/
+├── index.php              ← TODO 2-5
+├── config/db.php          ← TODO 1  ⭐ (empezar aquí)
+├── includes/
+│   ├── header.php         ← TODO 29
+│   └── footer.php         ← TODO 30
+├── contactos/
+│   ├── index.php          ← TODO 6-12
+│   ├── ver.php            ← TODO 13-15
+│   ├── crear.php          ← TODO 16-19
+│   ├── editar.php         ← TODO 20-23
+│   └── eliminar.php       ← TODO 24-27
+└── sql/setup.sql          ← (ya dado)</pre>
+
+        <div class="tip">
+          <strong style="color:#56d157">Consejo:</strong> Empieza siempre por
+          <code class="i">config/db.php</code>. Sin conexión, nada funciona.
+          Prueba la conexión antes de seguir.
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 1: Clase DB                                              -->
+      <!-- ============================================================ -->
+      <div id="p1" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">1</div>
+          <h3 class="fw-bold mb-0">Clase DB — Conexión PDO</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">config/db.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 1a</span>
+          <span class="todo-title">Completar las constantes de conexión</span>
+          <div class="text-muted small mt-1">
+            Reemplaza los <code class="i">???</code> con los valores de tu entorno MySQL local.
+          </div>
+        </div>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 1b</span>
+          <span class="todo-title">Implementar el método <code>conectar()</code></span>
+          <div class="text-muted small mt-1">
+            Debe crear la instancia PDO solo si no existe aún (Singleton).
+          </div>
+        </div>
+
+        <h5 class="fw-bold mt-4">Solución guiada:</h5>
+        <pre><span class="kw">public static function</span> <span class="fn">conectar</span>(): <span class="cls">PDO</span>
+{
+    <span class="kw">if</span> (self::<span class="kw">$conexion</span> === <span class="kw">null</span>) {
+        <span class="cmt">// Construye el DSN con las constantes</span>
+        <span class="kw">$dsn</span> = <span class="fn">sprintf</span>(
+            <span class="str">'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4'</span>,
+            self::HOST,
+            self::PUERTO,
+            self::NOMBRE
+        );
+        <span class="kw">$opciones</span> = [
+            <span class="cls">PDO</span>::<span class="num">ATTR_ERRMODE</span>            => <span class="cls">PDO</span>::<span class="num">ERRMODE_EXCEPTION</span>,
+            <span class="cls">PDO</span>::<span class="num">ATTR_DEFAULT_FETCH_MODE</span> => <span class="cls">PDO</span>::<span class="num">FETCH_ASSOC</span>,
+            <span class="cls">PDO</span>::<span class="num">ATTR_EMULATE_PREPARES</span>   => <span class="kw">false</span>,
+        ];
+        self::<span class="kw">$conexion</span> = <span class="kw">new</span> <span class="cls">PDO</span>(<span class="kw">$dsn</span>, self::USUARIO, self::CLAVE, <span class="kw">$opciones</span>);
+    }
+    <span class="kw">return</span> self::<span class="kw">$conexion</span>;
+}</pre>
+
+        <div class="tip">
+          <strong style="color:#56d157">Prueba rápida:</strong> Crea un archivo temporal
+          <code class="i">test.php</code> y ejecuta:
+          <code class="i">require_once 'config/db.php'; $pdo = DB::conectar(); echo 'OK';</code>
+          Si ves "OK" en el navegador, la conexión funciona.
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 2: Inicio                                                -->
+      <!-- ============================================================ -->
+      <div id="p2" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">2</div>
+          <h3 class="fw-bold mb-0">Página de inicio con estadísticas</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">index.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 2</span>
+          <span class="todo-title">Cargar config/db.php con require_once</span>
+          <div class="text-secondary small mt-1 font-monospace">require_once __DIR__ . '/config/db.php';</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 3</span>
+          <span class="todo-title">Conectar y obtener estadísticas</span>
+          <div class="text-muted small mt-1">
+            En un bloque try/catch, llama a <code class="i">DB::conectar()</code> y luego:
+            <br>a) Cuenta total de contactos con <code class="i">SELECT COUNT(*) FROM contactos</code>
+            <br>b) Cuenta los que tienen teléfono con <code class="i">WHERE telefono IS NOT NULL</code>
+            <br>Usa <code class="i">fetchColumn()</code> para obtener el número.
+          </div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 4</span>
+          <span class="todo-title">Mostrar título y subtítulo de la app</span>
+          <div class="text-muted small mt-1">Un h1 con ícono y un párrafo descriptivo.</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 5</span>
+          <span class="todo-title">Tarjetas de estadísticas</span>
+          <div class="text-muted small mt-1">
+            Dos cards con los números de <code class="i">$total</code> y <code class="i">$conTel</code>,
+            más un botón "Ver todos los contactos".
+          </div>
+        </div>
+
+        <h5 class="fw-bold mt-4">Código de referencia (TODO 3):</h5>
+        <pre><span class="kw">try</span> {
+    <span class="kw">$pdo</span>  = <span class="cls">DB</span>::<span class="fn">conectar</span>();
+    <span class="kw">$total</span>  = <span class="kw">$pdo</span>-><span class="fn">query</span>(<span class="str">'SELECT COUNT(*) FROM contactos'</span>)-><span class="fn">fetchColumn</span>();
+    <span class="kw">$conTel</span> = <span class="kw">$pdo</span>-><span class="fn">query</span>(<span class="str">'SELECT COUNT(*) FROM contactos WHERE telefono IS NOT NULL'</span>)-><span class="fn">fetchColumn</span>();
+} <span class="kw">catch</span> (<span class="cls">PDOException</span> <span class="kw">$e</span>) {
+    <span class="kw">$error</span> = <span class="str">'No se pudo conectar a la base de datos.'</span>;
+}</pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 3: Layout                                                -->
+      <!-- ============================================================ -->
+      <div id="p3" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">3</div>
+          <h3 class="fw-bold mb-0">Layout — Navbar y Footer</h3>
+        </div>
+        <p class="text-muted">Archivos: <code class="i">includes/header.php</code> y <code class="i">includes/footer.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 29a</span>
+          <span class="todo-title">Define la variable CSS <code>--color</code> con tu color principal</span>
+          <div class="text-secondary small mt-1 font-monospace">:root &#123; --color: #00758f; &#125;</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 29b</span>
+          <span class="todo-title">Aplica el color al navbar</span>
+          <div class="text-secondary small mt-1 font-monospace">.navbar &#123; background: var(--color) !important; &#125;</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 29c</span>
+          <span class="todo-title">Crea la barra de navegación Bootstrap</span>
+          <div class="text-muted small mt-1">
+            Navbar con brand "Mi Agenda", links a index.php, contactos/index.php
+            y contactos/crear.php. Usa <code class="i">$nivel</code> para construir rutas relativas.
+          </div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 30</span>
+          <span class="todo-title">Cierra el main y crea el footer</span>
+          <div class="text-muted small mt-1">
+            Cierra <code class="i">&lt;/main&gt;</code>, agrega un footer con el nombre de la app,
+            "SENA 3066552" y un badge "PHP + PDO + MySQL".
+          </div>
+        </div>
+
+        <div class="warn mt-3">
+          <strong style="color:var(--db2)">Tip de rutas:</strong>
+          El header usa <code class="i">$nivel</code> para calcular rutas relativas.
+          <code class="i">index.php</code> tiene <code class="i">$nivel = 1</code> →
+          <code class="i">str_repeat('../', 1)</code> = <code class="i">'../'</code>.
+          Los archivos en <code class="i">contactos/</code> tienen <code class="i">$nivel = 2</code> →
+          <code class="i">'../../'</code>.
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 4: Lista de contactos                                    -->
+      <!-- ============================================================ -->
+      <div id="p4" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">4</div>
+          <h3 class="fw-bold mb-0">Lista de contactos con filtros</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">contactos/index.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 6</span>
+          <span class="todo-title">require_once config/db.php (con ruta relativa correcta)</span>
+          <div class="text-secondary small mt-1 font-monospace">require_once __DIR__ . '/../config/db.php';</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 7</span>
+          <span class="todo-title">Obtener el filtro de categoría</span>
+          <div class="text-secondary small mt-1 font-monospace">$categoriaFiltro = $_GET['cat'] ?? '';</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 8</span>
+          <span class="todo-title">Conectar y consultar la BD</span>
+          <div class="text-muted small mt-1">
+            a) Categorías únicas con <code class="i">fetchAll(PDO::FETCH_COLUMN)</code><br>
+            b) Si hay filtro: <code class="i">prepare() + execute([$categoriaFiltro])</code><br>
+            c) Si no hay filtro: <code class="i">query()</code> simple<br>
+            d) <code class="i">fetchAll()</code> al array <code class="i">$contactos</code>
+          </div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 9</span>
+          <span class="todo-title">Título y botón "Agregar contacto"</span>
+          <div class="text-muted small mt-1">h2 con ícono + <code class="i">count($contactos)</code> + botón link a crear.php</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 10</span>
+          <span class="todo-title">Botones de filtro por categoría</span>
+          <div class="text-muted small mt-1">
+            Botón "Todos" y uno por cada categoría.
+            Usa <code class="i">urlencode($cat)</code> en el href.
+          </div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 11</span>
+          <span class="todo-title">Mensaje si no hay contactos</span>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 12</span>
+          <span class="todo-title">Grid de tarjetas de contactos</span>
+          <div class="text-muted small mt-1">
+            row g-4, col-sm-6 col-lg-4, card con nombre, email, teléfono, categoría, botones.
+            <strong class="text-warning">Usa htmlspecialchars() en TODO.</strong>
+          </div>
+        </div>
+
+        <h5 class="fw-bold mt-4">Código de referencia (TODO 8):</h5>
+        <pre><span class="kw">try</span> {
+    <span class="kw">$pdo</span> = <span class="cls">DB</span>::<span class="fn">conectar</span>();
+
+    <span class="cmt">// Categorías para los botones de filtro</span>
+    <span class="kw">$categorias</span> = <span class="kw">$pdo</span>
+        -><span class="fn">query</span>(<span class="str">'SELECT DISTINCT categoria FROM contactos ORDER BY categoria'</span>)
+        -><span class="fn">fetchAll</span>(<span class="cls">PDO</span>::<span class="num">FETCH_COLUMN</span>);
+
+    <span class="kw">if</span> (<span class="kw">$categoriaFiltro</span>) {
+        <span class="cmt">// Con filtro → prepare() para pasar el parámetro de forma segura</span>
+        <span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'SELECT * FROM contactos WHERE categoria = ? ORDER BY nombre'</span>);
+        <span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="kw">$categoriaFiltro</span>]);
+    } <span class="kw">else</span> {
+        <span class="cmt">// Sin filtro → query() está bien (no hay parámetros de usuario)</span>
+        <span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">query</span>(<span class="str">'SELECT * FROM contactos ORDER BY nombre'</span>);
+    }
+
+    <span class="kw">$contactos</span> = <span class="kw">$stmt</span>-><span class="fn">fetchAll</span>();
+
+} <span class="kw">catch</span> (<span class="cls">PDOException</span> <span class="kw">$e</span>) {
+    <span class="kw">$error</span> = <span class="str">'Error al consultar la base de datos.'</span>;
+}</pre>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 5: Ver detalle                                           -->
+      <!-- ============================================================ -->
+      <div id="p5" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">5</div>
+          <h3 class="fw-bold mb-0">Ver detalle de un contacto</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">contactos/ver.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 13</span>
+          <span class="todo-title">Validar el parámetro <code>id</code> de la URL</span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">$id</span> = <span class="fn">filter_input</span>(<span class="cls">INPUT_GET</span>, <span class="str">'id'</span>, <span class="cls">FILTER_VALIDATE_INT</span>);
+<span class="kw">if</span> (!<span class="kw">$id</span> || <span class="kw">$id</span> < <span class="num">1</span>) {
+    <span class="fn">header</span>(<span class="str">'Location: index.php'</span>);
+    <span class="fn">exit</span>;
+}</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 14</span>
+          <span class="todo-title">Cargar el contacto con <code>fetch()</code></span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'SELECT * FROM contactos WHERE id = :id LIMIT 1'</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="str">':id'</span> => <span class="kw">$id</span>]);
+<span class="kw">$contacto</span> = <span class="kw">$stmt</span>-><span class="fn">fetch</span>();
+<span class="kw">if</span> (!<span class="kw">$contacto</span>) { <span class="fn">header</span>(<span class="str">'Location: index.php'</span>); <span class="fn">exit</span>; }</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 15</span>
+          <span class="todo-title">Mostrar todos los datos del contacto</span>
+          <div class="text-muted small mt-1">
+            Nombre, email (con enlace <code class="i">mailto:</code>), teléfono (o "No registrado" si es null),
+            categoría, notas, fecha. Botones editar y eliminar.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 6: Crear                                                 -->
+      <!-- ============================================================ -->
+      <div id="p6" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">6</div>
+          <h3 class="fw-bold mb-0">Crear contacto — INSERT</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">contactos/crear.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 16</span>
+          <span class="todo-title">Recoger y limpiar los datos del formulario</span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">$nombre</span>   = <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'nombre'</span>]   ?? <span class="str">''</span>);
+<span class="kw">$email</span>    = <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'email'</span>]    ?? <span class="str">''</span>);
+<span class="kw">$telefono</span> = <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'telefono'</span>] ?? <span class="str">''</span>) ?: <span class="kw">null</span>;
+<span class="kw">$categoria</span>= <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'categoria'</span>]?? <span class="str">''</span>);
+<span class="kw">$notas</span>    = <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'notas'</span>]    ?? <span class="str">''</span>) ?: <span class="kw">null</span>;</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 17</span>
+          <span class="todo-title">Validar los datos</span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">if</span> (<span class="fn">empty</span>(<span class="kw">$nombre</span>))
+    <span class="kw">$errores</span>[] = <span class="str">'El nombre es obligatorio.'</span>;
+<span class="kw">if</span> (!<span class="fn">filter_var</span>(<span class="kw">$email</span>, <span class="cls">FILTER_VALIDATE_EMAIL</span>))
+    <span class="kw">$errores</span>[] = <span class="str">'El email no es válido.'</span>;
+<span class="kw">if</span> (!<span class="fn">in_array</span>(<span class="kw">$categoria</span>, <span class="kw">$categorias</span>, <span class="kw">true</span>))
+    <span class="kw">$errores</span>[] = <span class="str">'Selecciona una categoría válida.'</span>;</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 18</span>
+          <span class="todo-title">INSERT con prepared statement + PRG</span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+    <span class="str">'INSERT INTO contactos (nombre, email, telefono, categoria, notas)
+     VALUES (:nombre, :email, :telefono, :categoria, :notas)'</span>
+);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([
+    <span class="str">':nombre'</span>    => <span class="kw">$nombre</span>,
+    <span class="str">':email'</span>     => <span class="kw">$email</span>,
+    <span class="str">':telefono'</span>  => <span class="kw">$telefono</span>,
+    <span class="str">':categoria'</span> => <span class="kw">$categoria</span>,
+    <span class="str">':notas'</span>     => <span class="kw">$notas</span>,
+]);
+<span class="kw">$id</span> = <span class="kw">$pdo</span>-><span class="fn">lastInsertId</span>();
+<span class="fn">header</span>(<span class="str">"Location: ver.php?id={$id}&ok=1"</span>);
+<span class="fn">exit</span>;</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 19</span>
+          <span class="todo-title">Formulario Bootstrap con repoblación de valores</span>
+          <div class="text-muted small mt-1">
+            Campos: nombre, email, telefono, select de categoría, textarea notas.
+            Si hay errores, muéstralos en alert-danger. Los campos deben tener
+            <code class="i">value="&lt;?= htmlspecialchars($valores['nombre']) ?&gt;"</code>.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 7: Editar                                                -->
+      <!-- ============================================================ -->
+      <div id="p7" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">7</div>
+          <h3 class="fw-bold mb-0">Editar contacto — UPDATE</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">contactos/editar.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 20</span>
+          <span class="todo-title">Validar el id (de GET o POST)</span>
+          <div class="text-muted small mt-1">Igual que en ver.php, pero también acepta POST.</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 21</span>
+          <span class="todo-title">Cargar los datos actuales del contacto</span>
+          <div class="text-muted small mt-1">SELECT con prepare() + fetch(). Si no existe, redirige.</div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 22</span>
+          <span class="todo-title">Si es POST: validar + UPDATE</span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">$sql</span> = <span class="str">'UPDATE contactos
+        SET nombre=:nombre, email=:email, telefono=:telefono,
+            categoria=:categoria, notas=:notas
+        WHERE id=:id'</span>;
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="kw">$sql</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([..., <span class="str">':id'</span> => <span class="kw">$id</span>]);
+<span class="fn">header</span>(<span class="str">"Location: ver.php?id={$id}&ok=edit"</span>);
+<span class="fn">exit</span>;</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 23</span>
+          <span class="todo-title">Formulario igual que crear.php pero pre-llenado</span>
+          <div class="text-muted small mt-1">
+            El action apunta a <code class="i">editar.php?id=<?= $id ?></code>.
+            Agrega <code class="i">&lt;input type="hidden" name="id" value="..."&gt;</code>.
+            Los campos usan <code class="i">$contacto['campo']</code> como valor por defecto.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- PASO 8: Eliminar                                              -->
+      <!-- ============================================================ -->
+      <div id="p8" class="step-card">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge">8</div>
+          <h3 class="fw-bold mb-0">Eliminar contacto — DELETE</h3>
+        </div>
+        <p class="text-muted">Archivo: <code class="i">contactos/eliminar.php</code></p>
+
+        <div class="todo-box">
+          <span class="todo-num">TODO 24</span>
+          <span class="todo-title">Validar el id</span>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 25</span>
+          <span class="todo-title">Cargar el nombre del contacto (para mostrarlo en la confirmación)</span>
+          <div class="text-muted small mt-1"><code class="i">SELECT id, nombre, categoria FROM contactos WHERE id = ? LIMIT 1</code></div>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 26</span>
+          <span class="todo-title">Si confirman (POST + $_POST['confirmar']): DELETE</span>
+          <pre style="font-size:.8rem; margin-top:.5rem"><span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'DELETE FROM contactos WHERE id = ?'</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="kw">$id</span>]);
+<span class="kw">if</span> (<span class="kw">$stmt</span>-><span class="fn">rowCount</span>() > <span class="num">0</span>) {
+    <span class="fn">header</span>(<span class="str">'Location: index.php?ok=delete'</span>);
+    <span class="fn">exit</span>;
+}</pre>
+        </div>
+        <div class="todo-box">
+          <span class="todo-num">TODO 27</span>
+          <span class="todo-title">Pantalla de confirmación</span>
+          <div class="text-muted small mt-1">
+            Muestra el nombre del contacto. Formulario POST con
+            <code class="i">name="confirmar" value="1"</code> y botón cancelar.
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- VERIFICACIÓN                                                   -->
+      <!-- ============================================================ -->
+      <div id="verificar" class="step-card" style="border:2px solid var(--db)">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="step-badge" style="background:#27ae60"><i class="fas fa-check"></i></div>
+          <h3 class="fw-bold mb-0">Verificación final</h3>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-bold mb-3">Checklist funcional</h5>
+            <ul class="checklist">
+              <li>La BD <code class="i">sena_contactos</code> existe con datos</li>
+              <li><code class="i">index.php</code> muestra el total de contactos</li>
+              <li>La lista muestra todos los contactos</li>
+              <li>Los filtros de categoría funcionan</li>
+              <li>Ver detalle muestra todos los campos</li>
+              <li>Crear agrega un contacto nuevo a la BD</li>
+              <li>El formulario muestra errores si hay campos vacíos</li>
+              <li>Editar actualiza los datos en la BD</li>
+              <li>Eliminar pide confirmación y borra de la BD</li>
+              <li>Todos los valores de la BD se escapan con htmlspecialchars()</li>
+              <li>Todas las consultas con $_GET/$_POST usan prepare()</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold mb-3">URLs que deben funcionar</h5>
+            <div style="font-family:monospace; font-size:.8rem; background:#0d1117; color:#56d157; border-radius:8px; padding:1rem">
+              <div>✓ practica_app/index.php</div>
+              <div>✓ practica_app/contactos/index.php</div>
+              <div>✓ practica_app/contactos/index.php?cat=Trabajo</div>
+              <div>✓ practica_app/contactos/ver.php?id=1</div>
+              <div>✓ practica_app/contactos/ver.php?id=999 → redirige</div>
+              <div>✓ practica_app/contactos/crear.php</div>
+              <div>✓ practica_app/contactos/editar.php?id=1</div>
+              <div>✓ practica_app/contactos/eliminar.php?id=1</div>
+            </div>
+            <div class="mt-3 d-grid">
+              <a href="enunciado.html" class="btn" style="background:var(--db); color:#fff">
+                <i class="fas fa-star me-1"></i> Ver criterios de evaluación
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col contenido -->
+  </div><!-- /row -->
+</div><!-- /container-fluid -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const sections = document.querySelectorAll('[id]');
+const links    = document.querySelectorAll('.nav-link-side');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const a = document.querySelector(`.nav-link-side[href="#${e.target.id}"]`);
+            if (a) a.classList.add('active');
+        }
+    });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

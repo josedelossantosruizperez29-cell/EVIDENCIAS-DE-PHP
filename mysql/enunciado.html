@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Enunciado — PHP + MySQL — SENA 3066552</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --db: #00758f; --db2: #f29111; }
+    body { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; }
+    .hero { background: linear-gradient(135deg, #0d1117 0%, #0d2137 100%); color: #e6edf3; }
+    .section-card { background: #fff; border-radius: 16px; box-shadow: 0 2px 16px rgba(0,0,0,.08); }
+    .req-badge { background: var(--db); color: #fff; border-radius: 8px; padding: 4px 12px; font-size:.8rem; font-weight:700; }
+    .pts { background: #1e2a35; color: #56d1f0; border-radius: 8px; padding: 2px 10px; font-size:.8rem; font-weight:700; }
+    code { background: #1e2a35; color: #79c0ff; padding: 2px 6px; border-radius: 4px; font-size:.88em; }
+    .url-check { background: #0d1117; color: #56d157; border-radius: 8px; font-family: monospace; font-size:.85rem; padding: 8px 14px; display:block; margin: 4px 0; }
+    .task-num { width:32px; height:32px; border-radius:50%; background:var(--db); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.9rem; flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero py-5">
+  <div class="container py-2">
+    <a href="index.html" class="text-secondary text-decoration-none small mb-3 d-inline-block">
+      <i class="fas fa-arrow-left me-1"></i> Módulo PHP + MySQL
+    </a>
+    <div class="d-flex align-items-center gap-3 mb-3">
+      <span class="req-badge"><i class="fas fa-database me-1"></i>PHP + MySQL</span>
+      <span class="req-badge" style="background:#6c757d">Práctica obligatoria</span>
+    </div>
+    <h1 class="fw-bold display-5 mb-2">Agenda de Contactos</h1>
+    <p class="lead mb-0" style="color:#adbac7">
+      Construye un CRUD completo con PHP y MySQL usando PDO y Prepared Statements.
+    </p>
+    <div class="mt-3 d-flex gap-3 flex-wrap" style="font-size:.85rem; color:#adbac7">
+      <span><i class="fas fa-database me-1" style="color:var(--db)"></i> Base de datos real</span>
+      <span><i class="fas fa-shield-halved me-1" style="color:#56d157"></i> Prepared Statements</span>
+      <span><i class="fas fa-recycle me-1" style="color:var(--db2)"></i> CRUD completo</span>
+      <span><i class="fas fa-star me-1" style="color:#f0a356"></i> 100 puntos</span>
+    </div>
+  </div>
+</section>
+
+<div class="container py-5">
+  <div class="row g-4">
+
+    <!-- Columna principal -->
+    <div class="col-lg-8">
+
+      <!-- ¿QUÉ VAS A CONSTRUIR? -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-bullseye me-2" style="color:var(--db)"></i>¿Qué vas a construir?</h2>
+        <p>
+          Una <strong>Agenda de Contactos</strong> web completamente funcional, donde los datos
+          se guardan en una base de datos MySQL. La app permite listar, ver, crear, editar
+          y eliminar contactos — es decir, un <strong>CRUD completo</strong>.
+        </p>
+        <div class="row g-3 mt-2">
+          <div class="col-sm-6">
+            <div class="p-3 rounded" style="background:#f0f8ff; border:1px solid #bee3f8">
+              <div class="fw-bold mb-1"><i class="fas fa-list me-1" style="color:var(--db)"></i> Listar contactos</div>
+              <div class="text-muted small">Con filtro por categoría y conteo total</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded" style="background:#f0fff4; border:1px solid #9ae6b4">
+              <div class="fw-bold mb-1"><i class="fas fa-eye me-1" style="color:#38a169"></i> Ver detalle</div>
+              <div class="text-muted small">Todos los datos de un contacto por su ID</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded" style="background:#fffbeb; border:1px solid #fbd38d">
+              <div class="fw-bold mb-1"><i class="fas fa-plus me-1" style="color:#d69e2e"></i> Crear contacto</div>
+              <div class="text-muted small">Formulario validado + INSERT seguro</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded" style="background:#fff5f5; border:1px solid #fed7d7">
+              <div class="fw-bold mb-1"><i class="fas fa-pen me-1" style="color:#e53e3e"></i> Editar y eliminar</div>
+              <div class="text-muted small">UPDATE y DELETE con confirmación</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ESTRUCTURA DE LA BD -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-table me-2" style="color:var(--db)"></i>Base de datos</h2>
+        <p>La BD se llama <code>sena_contactos</code> y tiene una tabla <code>contactos</code>:</p>
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm">
+            <thead class="table-dark">
+              <tr>
+                <th>Campo</th><th>Tipo</th><th>Restricción</th><th>Descripción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><code>id</code></td><td>INT</td><td>PK, AUTO_INCREMENT</td><td>Identificador único</td></tr>
+              <tr><td><code>nombre</code></td><td>VARCHAR(100)</td><td>NOT NULL</td><td>Nombre completo</td></tr>
+              <tr><td><code>email</code></td><td>VARCHAR(150)</td><td>NOT NULL, UNIQUE</td><td>Correo electrónico</td></tr>
+              <tr><td><code>telefono</code></td><td>VARCHAR(20)</td><td>NULL</td><td>Teléfono (opcional)</td></tr>
+              <tr><td><code>categoria</code></td><td>ENUM(...)</td><td>NOT NULL</td><td>Amigo, Familiar, Trabajo, Otro</td></tr>
+              <tr><td><code>notas</code></td><td>TEXT</td><td>NULL</td><td>Notas adicionales</td></tr>
+              <tr><td><code>creado_en</code></td><td>DATETIME</td><td>DEFAULT NOW()</td><td>Fecha de registro</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="alert alert-info mt-3 mb-0">
+          <i class="fas fa-info-circle me-2"></i>
+          El script <code>practica_app/sql/setup.sql</code> ya está listo con la estructura
+          y 8 contactos de prueba. Ejecútalo antes de empezar.
+        </div>
+      </div>
+
+      <!-- ESTRUCTURA DE ARCHIVOS -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-folder-tree me-2" style="color:var(--db)"></i>Estructura de archivos</h2>
+        <div style="background:#0d1117; color:#e6edf3; border-radius:10px; padding:1.2rem; font-family:monospace; font-size:.83rem; line-height:1.7">
+          <div style="color:#56d1f0">practica_app/</div>
+          <div style="color:#aaa; padding-left:1.2rem">├── <span style="color:#f0a356">index.php</span>             ← Inicio con estadísticas</div>
+          <div style="color:#aaa; padding-left:1.2rem">├── config/</div>
+          <div style="color:#aaa; padding-left:2.4rem">└── <span style="color:#79c0ff">db.php</span>            ← Clase DB (PDO Singleton)</div>
+          <div style="color:#aaa; padding-left:1.2rem">├── includes/</div>
+          <div style="color:#aaa; padding-left:2.4rem">├── <span style="color:#79c0ff">header.php</span>        ← Navegación</div>
+          <div style="color:#aaa; padding-left:2.4rem">└── <span style="color:#79c0ff">footer.php</span>        ← Pie de página</div>
+          <div style="color:#aaa; padding-left:1.2rem">├── contactos/</div>
+          <div style="color:#aaa; padding-left:2.4rem">├── <span style="color:#56d157">index.php</span>         ← Lista + filtros</div>
+          <div style="color:#aaa; padding-left:2.4rem">├── <span style="color:#56d157">ver.php</span>           ← Detalle de un contacto</div>
+          <div style="color:#aaa; padding-left:2.4rem">├── <span style="color:#56d157">crear.php</span>         ← Formulario + INSERT</div>
+          <div style="color:#aaa; padding-left:2.4rem">├── <span style="color:#56d157">editar.php</span>        ← Formulario + UPDATE</div>
+          <div style="color:#aaa; padding-left:2.4rem">└── <span style="color:#56d157">eliminar.php</span>      ← Confirmación + DELETE</div>
+          <div style="color:#aaa; padding-left:1.2rem">└── sql/</div>
+          <div style="color:#aaa; padding-left:2.4rem">└── <span style="color:#b56df0">setup.sql</span>         ← Script de BD (ya dado)</div>
+        </div>
+      </div>
+
+      <!-- TAREAS -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-list-check me-2" style="color:var(--db)"></i>Tareas (27 TODOs)</h2>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">1</div>
+          <div>
+            <div class="fw-bold">Clase DB con PDO <span class="pts">15 pts</span></div>
+            <div class="text-muted small">
+              Completa <code>config/db.php</code>: constantes de conexión y el método
+              <code>conectar()</code> que implementa el patrón Singleton.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">2</div>
+          <div>
+            <div class="fw-bold">Página de inicio con stats <span class="pts">10 pts</span></div>
+            <div class="text-muted small">
+              <code>index.php</code>: conecta, cuenta total de contactos y cuántos tienen
+              teléfono, muestra tarjetas con las estadísticas.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">3</div>
+          <div>
+            <div class="fw-bold">Lista de contactos + filtros <span class="pts">15 pts</span></div>
+            <div class="text-muted small">
+              <code>contactos/index.php</code>: lista todos los contactos con filtro
+              por categoría. Usa <code>prepare()</code> cuando hay filtro activo.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">4</div>
+          <div>
+            <div class="fw-bold">Ver detalle de un contacto <span class="pts">10 pts</span></div>
+            <div class="text-muted small">
+              <code>contactos/ver.php</code>: valida el ID, carga con
+              <code>fetch()</code>, muestra todos los campos.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">5</div>
+          <div>
+            <div class="fw-bold">Formulario + INSERT <span class="pts">20 pts</span></div>
+            <div class="text-muted small">
+              <code>contactos/crear.php</code>: formulario Bootstrap, validación server-side,
+              INSERT con parámetros nombrados, PRG pattern.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">6</div>
+          <div>
+            <div class="fw-bold">Editar contacto (UPDATE) <span class="pts">15 pts</span></div>
+            <div class="text-muted small">
+              <code>contactos/editar.php</code>: carga datos actuales, formulario
+              pre-llenado, UPDATE seguro con prepared statement.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">7</div>
+          <div>
+            <div class="fw-bold">Eliminar con confirmación (DELETE) <span class="pts">10 pts</span></div>
+            <div class="text-muted small">
+              <code>contactos/eliminar.php</code>: pantalla de confirmación,
+              DELETE con <code>prepare()</code>, verificar con <code>rowCount()</code>.
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-3 align-items-start mb-3">
+          <div class="task-num">8</div>
+          <div>
+            <div class="fw-bold">Layout: navbar y footer <span class="pts">5 pts</span></div>
+            <div class="text-muted small">
+              <code>includes/header.php</code> y <code>footer.php</code>:
+              navegación funcional y footer con badge de tecnología.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGLAS DE SEGURIDAD -->
+      <div class="section-card p-4 mb-4">
+        <h2 class="fw-bold mb-3"><i class="fas fa-shield-halved me-2" style="color:#56d157"></i>Reglas de seguridad obligatorias</h2>
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 rounded border border-success">
+              <div class="fw-bold text-success mb-1">✓ Siempre usar Prepared Statements</div>
+              <div class="text-muted small">
+                Cualquier consulta con parámetros del usuario
+                (<code>$_GET</code>, <code>$_POST</code>) DEBE usar
+                <code>prepare()</code> + <code>execute()</code>.
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded border border-success">
+              <div class="fw-bold text-success mb-1">✓ Escapar con htmlspecialchars()</div>
+              <div class="text-muted small">
+                Todo valor de la BD que se muestre en HTML debe
+                pasar por <code>htmlspecialchars()</code> para evitar XSS.
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded border border-success">
+              <div class="fw-bold text-success mb-1">✓ Validar IDs antes de usar</div>
+              <div class="text-muted small">
+                Usar <code>filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT)</code>
+                y redirigir si el ID es inválido.
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 rounded border border-success">
+              <div class="fw-bold text-success mb-1">✓ Try/catch en todo acceso a BD</div>
+              <div class="text-muted small">
+                Envuelve CADA llamada a DB::conectar() y a
+                <code>$stmt->execute()</code> en un bloque
+                <code>try { } catch (PDOException $e) { }</code>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-4">
+
+      <!-- Checklist de verificación -->
+      <div class="section-card p-4 mb-4 sticky-top" style="top:20px">
+        <h5 class="fw-bold mb-3">
+          <i class="fas fa-circle-check me-2" style="color:var(--db)"></i>
+          URLs de verificación
+        </h5>
+        <p class="text-muted small mb-3">
+          Cuando termines, estas URLs deben funcionar correctamente:
+        </p>
+        <span class="url-check">practica_app/index.php</span>
+        <span class="url-check">practica_app/contactos/index.php</span>
+        <span class="url-check">practica_app/contactos/ver.php?id=1</span>
+        <span class="url-check">practica_app/contactos/crear.php</span>
+        <span class="url-check">practica_app/contactos/editar.php?id=1</span>
+        <span class="url-check">practica_app/contactos/eliminar.php?id=1</span>
+
+        <hr>
+
+        <h6 class="fw-bold mb-2">Distribución de puntos</h6>
+        <table class="table table-sm">
+          <tr><td>Clase DB / conexión</td><td class="text-end fw-bold">15</td></tr>
+          <tr><td>Index con stats</td><td class="text-end fw-bold">10</td></tr>
+          <tr><td>Lista + filtros</td><td class="text-end fw-bold">15</td></tr>
+          <tr><td>Ver detalle</td><td class="text-end fw-bold">10</td></tr>
+          <tr><td>Crear (INSERT)</td><td class="text-end fw-bold">20</td></tr>
+          <tr><td>Editar (UPDATE)</td><td class="text-end fw-bold">15</td></tr>
+          <tr><td>Eliminar (DELETE)</td><td class="text-end fw-bold">10</td></tr>
+          <tr><td>Layout / navbar</td><td class="text-end fw-bold">5</td></tr>
+          <tr class="table-dark fw-bold"><td>Total</td><td class="text-end">100</td></tr>
+        </table>
+
+        <div class="mt-3 d-grid gap-2">
+          <a href="practica.html" class="btn btn-sm" style="background:var(--db); color:#fff">
+            <i class="fas fa-keyboard me-1"></i> Guía con TODOs
+          </a>
+          <a href="index.html" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Volver al módulo
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

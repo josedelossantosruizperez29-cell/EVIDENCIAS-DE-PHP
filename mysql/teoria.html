@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teoría PHP + MySQL — SENA 3066552</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root { --db:#00758f; --db2:#f29111; --danger:#e74c3c; --success:#27ae60; }
+    body { background:#f8f9fa; font-family:'Segoe UI',sans-serif; }
+    /* Sidebar */
+    .sidebar { position:sticky; top:80px; height:calc(100vh - 100px); overflow-y:auto; }
+    .nav-section { font-size:.72rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#6c757d; padding:10px 12px 4px; }
+    .nav-link-side { display:block; padding:6px 12px; border-radius:8px; font-size:.87rem; color:#495057; text-decoration:none; transition:background .15s; }
+    .nav-link-side:hover, .nav-link-side.active { background:#e3f2fd; color:var(--db); font-weight:600; }
+    /* Secciones */
+    .section { scroll-margin-top: 80px; }
+    .card-section { background:#fff; border-radius:16px; box-shadow:0 2px 16px rgba(0,0,0,.07); padding:2rem; margin-bottom:2rem; }
+    /* Código */
+    pre { background:#0d1117; color:#e6edf3; border-radius:10px; padding:1.2rem; font-size:.83rem; overflow-x:auto; line-height:1.6; }
+    code.inline { background:#1e2a35; color:#79c0ff; padding:2px 6px; border-radius:4px; font-size:.88em; }
+    .kw  { color:#ff7b72; }   /* keywords PHP */
+    .str { color:#a5d6ff; }   /* strings */
+    .cmt { color:#8b949e; }   /* comments */
+    .cls { color:#ffa657; }   /* class names */
+    .fn  { color:#d2a8ff; }   /* function names */
+    .num { color:#79c0ff; }   /* numbers */
+    /* Badges y alertas */
+    .badge-db  { background:var(--db);   color:#fff; }
+    .badge-ok  { background:var(--success); color:#fff; }
+    .badge-bad { background:var(--danger);  color:#fff; }
+    .box-danger  { background:#2a0000; border:1px solid #e74c3c; border-radius:10px; }
+    .box-success { background:#002a1a; border:1px solid #27ae60; border-radius:10px; }
+    .box-info    { background:#001e2a; border:1px solid var(--db); border-radius:10px; }
+    /* Comparación lado a lado */
+    .compare-bad  { background:#1a0a0a; border:2px solid var(--danger); border-radius:10px; }
+    .compare-good { background:#0a1a0a; border:2px solid var(--success); border-radius:10px; }
+    /* Tabla PDO vs MySQLi */
+    .vs-table th { background:#1e2a35; color:#e6edf3; }
+    .vs-table td { vertical-align:middle; }
+    /* Navbar */
+    .navbar { background:#0d1117 !important; border-bottom:2px solid var(--db); position:sticky; top:0; z-index:1030; }
+    /* Flujo steps */
+    .flow-box { background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:1rem; }
+    .flow-num { width:28px; height:28px; border-radius:50%; background:var(--db); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:.8rem; flex-shrink:0; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-dark">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="index.html">
+      <i class="fas fa-database me-2" style="color:var(--db2)"></i>
+      PHP + MySQL
+    </a>
+    <div class="d-flex gap-3 align-items-center">
+      <a href="demo/index.php" class="btn btn-sm" style="background:var(--db); color:#fff">
+        <i class="fas fa-play me-1"></i> Ver Demo
+      </a>
+      <a href="practica.html" class="btn btn-sm btn-outline-secondary text-light">
+        <i class="fas fa-keyboard me-1"></i> Práctica
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-lg-2 d-none d-lg-block py-3 ps-3 pe-0">
+      <div class="sidebar">
+        <div class="nav-section">Fundamentos</div>
+        <a href="#s1" class="nav-link-side active">1. El problema de persistencia</a>
+        <a href="#s2" class="nav-link-side">2. MySQL en 5 minutos</a>
+        <a href="#s3" class="nav-link-side">3. PDO vs MySQLi</a>
+
+        <div class="nav-section mt-2">Conexión</div>
+        <a href="#s4" class="nav-link-side">4. Primera conexión</a>
+        <a href="#s5" class="nav-link-side">5. Clase Database</a>
+
+        <div class="nav-section mt-2">Consultas</div>
+        <a href="#s6" class="nav-link-side">6. SELECT y leer datos</a>
+        <a href="#s7" class="nav-link-side">7. SQL Injection ⚠️</a>
+        <a href="#s8" class="nav-link-side">8. Prepared Statements</a>
+
+        <div class="nav-section mt-2">CRUD</div>
+        <a href="#s9" class="nav-link-side">9. INSERT</a>
+        <a href="#s10" class="nav-link-side">10. UPDATE</a>
+        <a href="#s11" class="nav-link-side">11. DELETE</a>
+
+        <div class="nav-section mt-2">Avanzado</div>
+        <a href="#s12" class="nav-link-side">12. Manejo de errores</a>
+        <a href="#s13" class="nav-link-side">13. Buenas prácticas</a>
+
+        <div class="mt-3 ps-2">
+          <a href="demo/index.php" class="btn btn-sm w-100 mb-1" style="background:var(--db);color:#fff;font-size:.75rem">
+            <i class="fas fa-play me-1"></i> Ver Demo
+          </a>
+          <a href="practica.html" class="btn btn-sm btn-outline-secondary w-100" style="font-size:.75rem">
+            <i class="fas fa-code me-1"></i> Práctica
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="col-lg-10 py-4 px-4">
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 1: El problema                                  -->
+      <!-- ====================================================== -->
+      <div id="s1" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">1</span>
+          El problema: los arrays se olvidan todo
+        </h2>
+        <p class="text-muted mb-4">¿Por qué necesitamos una base de datos?</p>
+
+        <div class="row g-4 align-items-start">
+          <div class="col-md-6">
+            <h5 class="fw-bold text-danger mb-2">😞 Con arrays en PHP</h5>
+            <pre><span class="cmt">// Cada vez que recargas la página...</span>
+<span class="kw">$contactos</span> = [
+    ['nombre' => <span class="str">'Ana García'</span>, 'email' => <span class="str">'ana@mail.com'</span>],
+    ['nombre' => <span class="str">'Carlos'</span>,    'email' => <span class="str">'carlos@mail.com'</span>],
+];
+
+<span class="cmt">// Si el usuario crea un nuevo contacto:</span>
+<span class="kw">$contactos</span>[] = [<span class="str">'nombre'</span> => <span class="str">'Nuevo'</span>, ...];
+
+<span class="cmt">// Al recargar la página...
+// ¡EL CONTACTO NUEVO DESAPARECIÓ! 💨
+// Los arrays viven solo en la petición actual.</span></pre>
+            <div class="box-danger p-3 mt-2">
+              <strong class="text-danger">Problema:</strong> PHP no tiene memoria entre peticiones.
+              Cada request empieza desde cero.
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold text-success mb-2">✅ Con MySQL</h5>
+            <pre><span class="cmt">// Los datos viven en el servidor MySQL</span>
+<span class="cmt">// y persisten entre peticiones:</span>
+
+<span class="kw">$pdo</span> = <span class="cls">DB</span>::<span class="fn">conectar</span>();
+
+<span class="cmt">// Insertar un contacto nuevo:</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+    <span class="str">'INSERT INTO contactos (nombre, email)
+     VALUES (:nombre, :email)'</span>
+);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="str">':nombre'</span> => <span class="str">'Nuevo'</span>, ...]);
+
+<span class="cmt">// Al recargar la página...
+// ¡El contacto SIGUE AHÍ! 🎉</span></pre>
+            <div class="box-success p-3 mt-2">
+              <strong class="text-success">Solución:</strong> MySQL guarda los datos en disco.
+              Persisten entre peticiones, reinicios del servidor, etc.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 2: MySQL                                        -->
+      <!-- ====================================================== -->
+      <div id="s2" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">2</span>
+          MySQL en 5 minutos
+        </h2>
+        <p class="text-muted mb-4">Los conceptos clave que necesitas saber</p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-sm-6 col-lg-3">
+            <div class="p-3 text-center rounded h-100" style="background:#e8f4f8; border:1px solid #bee3f8">
+              <div style="font-size:2rem">🏢</div>
+              <div class="fw-bold mt-1">Base de datos</div>
+              <div class="text-muted small">Contenedor de tablas. Ej: <code class="inline">sena_tienda</code></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="p-3 text-center rounded h-100" style="background:#f0fff4; border:1px solid #9ae6b4">
+              <div style="font-size:2rem">📋</div>
+              <div class="fw-bold mt-1">Tabla</div>
+              <div class="text-muted small">Como una hoja de Excel. Ej: <code class="inline">productos</code></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="p-3 text-center rounded h-100" style="background:#fffbeb; border:1px solid #fbd38d">
+              <div style="font-size:2rem">↔️</div>
+              <div class="fw-bold mt-1">Columna (campo)</div>
+              <div class="text-muted small">Tipo de dato. Ej: <code class="inline">nombre</code>, <code class="inline">precio</code></div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <div class="p-3 text-center rounded h-100" style="background:#fff5f5; border:1px solid #fed7d7">
+              <div style="font-size:2rem">📄</div>
+              <div class="fw-bold mt-1">Fila (registro)</div>
+              <div class="text-muted small">Un dato concreto. Ej: el producto "Laptop"</div>
+            </div>
+          </div>
+        </div>
+
+        <h5 class="fw-bold mb-3">Las 4 operaciones SQL fundamentales (CRUD)</h5>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <pre><span class="cmt">-- Leer todos los registros</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> productos;
+
+<span class="cmt">-- Leer con condición</span>
+<span class="kw">SELECT</span> nombre, precio
+<span class="kw">FROM</span> productos
+<span class="kw">WHERE</span> categoria = <span class="str">'Periféricos'</span>
+<span class="kw">ORDER BY</span> precio <span class="kw">DESC</span>;
+
+<span class="cmt">-- Insertar un registro</span>
+<span class="kw">INSERT INTO</span> productos (nombre, precio)
+<span class="kw">VALUES</span> (<span class="str">'Mouse'</span>, <span class="num">89000</span>);</pre>
+          </div>
+          <div class="col-md-6">
+            <pre><span class="cmt">-- Actualizar un registro</span>
+<span class="kw">UPDATE</span> productos
+<span class="kw">SET</span> precio = <span class="num">75000</span>
+<span class="kw">WHERE</span> id = <span class="num">1</span>;
+
+<span class="cmt">-- Eliminar un registro</span>
+<span class="kw">DELETE FROM</span> productos
+<span class="kw">WHERE</span> id = <span class="num">1</span>;
+
+<span class="cmt">-- Contar registros</span>
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">FROM</span> productos;
+<span class="cmt">-- → 10</span></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 3: PDO vs MySQLi                               -->
+      <!-- ====================================================== -->
+      <div id="s3" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">3</span>
+          PDO vs MySQLi — ¿Cuál usar?
+        </h2>
+        <p class="text-muted mb-4">PHP ofrece dos formas de conectarse a MySQL. Siempre elegimos <strong>PDO</strong>.</p>
+
+        <div class="table-responsive">
+          <table class="table vs-table table-bordered">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th class="text-center"><span class="badge badge-db">PDO</span> ✅</th>
+                <th class="text-center"><span class="badge bg-secondary">MySQLi</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Soporta múltiples BD</strong></td>
+                <td class="text-center text-success fw-bold">✓ MySQL, PostgreSQL, SQLite…</td>
+                <td class="text-center text-danger">✗ Solo MySQL</td>
+              </tr>
+              <tr>
+                <td><strong>Prepared Statements</strong></td>
+                <td class="text-center text-success fw-bold">✓ Nativo y limpio</td>
+                <td class="text-center text-warning">⚠ Verboso</td>
+              </tr>
+              <tr>
+                <td><strong>API orientada a objetos</strong></td>
+                <td class="text-center text-success fw-bold">✓ Solo OO</td>
+                <td class="text-center">Procedural y OO mezclados</td>
+              </tr>
+              <tr>
+                <td><strong>Manejo de errores</strong></td>
+                <td class="text-center text-success fw-bold">✓ Excepciones (try/catch)</td>
+                <td class="text-center text-warning">⚠ Códigos de error</td>
+              </tr>
+              <tr>
+                <td><strong>Parámetros con nombres</strong></td>
+                <td class="text-center text-success fw-bold">✓ :nombre</td>
+                <td class="text-center text-danger">✗ Solo posicionales (?)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="box-info p-3 mt-2">
+          <strong style="color:var(--db)">Conclusión:</strong>
+          <span class="text-light"> Usa <strong>PDO</strong> siempre. Si algún día migras de MySQL a PostgreSQL,
+          solo cambias el DSN — el resto del código queda igual.</span>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 4: Primera conexión                            -->
+      <!-- ====================================================== -->
+      <div id="s4" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">4</span>
+          Tu primera conexión PDO
+        </h2>
+        <p class="text-muted mb-4">El hola mundo de las bases de datos</p>
+
+        <pre><span class="kw">&lt;?php</span>
+<span class="cmt">// ── Paso 1: DSN (Data Source Name) ────────────────────────────
+// Formato: 'driver:host=HOST;dbname=BD;charset=CHARSET'</span>
+<span class="kw">$dsn</span> = <span class="str">'mysql:host=localhost;dbname=sena_tienda;charset=utf8mb4'</span>;
+
+<span class="cmt">// ── Paso 2: Opciones recomendadas ─────────────────────────────</span>
+<span class="kw">$opciones</span> = [
+    <span class="cls">PDO</span>::<span class="num">ATTR_ERRMODE</span>            => <span class="cls">PDO</span>::<span class="num">ERRMODE_EXCEPTION</span>,  <span class="cmt">// lanza excepciones</span>
+    <span class="cls">PDO</span>::<span class="num">ATTR_DEFAULT_FETCH_MODE</span> => <span class="cls">PDO</span>::<span class="num">FETCH_ASSOC</span>,         <span class="cmt">// arrays asociativos</span>
+    <span class="cls">PDO</span>::<span class="num">ATTR_EMULATE_PREPARES</span>   => <span class="kw">false</span>,                      <span class="cmt">// prepared reales</span>
+];
+
+<span class="cmt">// ── Paso 3: Crear la instancia PDO ─────────────────────────────</span>
+<span class="kw">try</span> {
+    <span class="kw">$pdo</span> = <span class="kw">new</span> <span class="cls">PDO</span>(<span class="kw">$dsn</span>, <span class="str">'root'</span>, <span class="str">''</span>, <span class="kw">$opciones</span>);
+    <span class="fn">echo</span> <span class="str">'Conectado a MySQL 🎉'</span>;
+} <span class="kw">catch</span> (<span class="cls">PDOException</span> <span class="kw">$e</span>) {
+    <span class="fn">echo</span> <span class="str">'Error: '</span> . <span class="kw">$e</span>-><span class="fn">getMessage</span>();
+    <span class="cmt">// En producción: log del error, NO mostrarlo al usuario</span>
+}</pre>
+
+        <div class="row g-3 mt-3">
+          <div class="col-md-4">
+            <div class="p-3 rounded" style="background:#1e2a35">
+              <div class="fw-bold text-info mb-1"><i class="fas fa-plug me-1"></i>DSN</div>
+              <div class="text-secondary small">
+                Data Source Name. Le dice a PDO qué driver usar, dónde conectarse y a qué BD.
+                <br><br>
+                <code class="inline">mysql:</code> driver<br>
+                <code class="inline">host=</code> servidor<br>
+                <code class="inline">dbname=</code> base de datos<br>
+                <code class="inline">charset=utf8mb4</code> tildes y emojis
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 rounded" style="background:#1e2a35">
+              <div class="fw-bold text-warning mb-1"><i class="fas fa-sliders me-1"></i>Opciones clave</div>
+              <div class="text-secondary small">
+                <strong class="text-white">ERRMODE_EXCEPTION</strong>
+                <br>Sin esto, los errores pasan silenciosamente. Con esto lanza PDOException.
+                <br><br>
+                <strong class="text-white">FETCH_ASSOC</strong>
+                <br>Las filas se devuelven como array asociativo: <code class="inline">$fila['nombre']</code>.
+                <br><br>
+                <strong class="text-white">EMULATE_PREPARES = false</strong>
+                <br>Prepared Statements reales, no simulados.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 rounded" style="background:#1e2a35">
+              <div class="fw-bold text-danger mb-1"><i class="fas fa-triangle-exclamation me-1"></i>Errores comunes</div>
+              <div class="text-secondary small">
+                <strong class="text-white">Access denied</strong>
+                <br>Usuario o contraseña incorrectos.
+                <br><br>
+                <strong class="text-white">Unknown database</strong>
+                <br>La BD no existe. Ejecuta primero setup.sql.
+                <br><br>
+                <strong class="text-white">Connection refused</strong>
+                <br>MySQL no está activo. Arranca XAMPP.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 5: Clase Database                              -->
+      <!-- ====================================================== -->
+      <div id="s5" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">5</span>
+          Clase Database — Patrón Singleton
+        </h2>
+        <p class="text-muted mb-4">Cómo reutilizar la conexión en toda la aplicación</p>
+
+        <p>
+          Si en cada archivo PHP creas <code class="inline">new PDO(...)</code>, tu app abrirá
+          múltiples conexiones a MySQL. El patrón <strong>Singleton</strong> garantiza que
+          se crea <em>una sola vez</em> y se reutiliza.
+        </p>
+
+        <pre><span class="kw">&lt;?php</span>
+<span class="cmt">// config/db.php</span>
+<span class="kw">class</span> <span class="cls">DB</span>
+{
+    <span class="kw">private const</span> HOST    = <span class="str">'localhost'</span>;
+    <span class="kw">private const</span> NOMBRE  = <span class="str">'sena_tienda'</span>;
+    <span class="kw">private const</span> USUARIO = <span class="str">'root'</span>;
+    <span class="kw">private const</span> CLAVE   = <span class="str">''</span>;
+
+    <span class="cmt">/** @var PDO|null  La instancia única */</span>
+    <span class="kw">private static</span> ?<span class="cls">PDO</span> <span class="kw">$conexion</span> = <span class="kw">null</span>;
+
+    <span class="kw">public static function</span> <span class="fn">conectar</span>(): <span class="cls">PDO</span>
+    {
+        <span class="kw">if</span> (self::<span class="kw">$conexion</span> === <span class="kw">null</span>) {           <span class="cmt">// ¿primera vez?</span>
+            <span class="kw">$dsn</span> = <span class="str">'mysql:host='</span> . self::HOST .
+                   <span class="str">';dbname='</span>  . self::NOMBRE .
+                   <span class="str">';charset=utf8mb4'</span>;
+            <span class="kw">$opts</span> = [
+                <span class="cls">PDO</span>::<span class="num">ATTR_ERRMODE</span>            => <span class="cls">PDO</span>::<span class="num">ERRMODE_EXCEPTION</span>,
+                <span class="cls">PDO</span>::<span class="num">ATTR_DEFAULT_FETCH_MODE</span> => <span class="cls">PDO</span>::<span class="num">FETCH_ASSOC</span>,
+                <span class="cls">PDO</span>::<span class="num">ATTR_EMULATE_PREPARES</span>   => <span class="kw">false</span>,
+            ];
+            self::<span class="kw">$conexion</span> = <span class="kw">new</span> <span class="cls">PDO</span>(<span class="kw">$dsn</span>, self::USUARIO, self::CLAVE, <span class="kw">$opts</span>);
+        }
+        <span class="kw">return</span> self::<span class="kw">$conexion</span>;   <span class="cmt">// siempre devuelve la misma instancia</span>
+    }
+
+    <span class="kw">private function</span> <span class="fn">__construct</span>() {}  <span class="cmt">// evita "new DB()"</span>
+    <span class="kw">private function</span> <span class="fn">__clone</span>()     {}  <span class="cmt">// evita clonar</span>
+}
+
+<span class="cmt">// ── Uso desde cualquier archivo PHP ──────────────────────────
+// require_once __DIR__ . '/config/db.php';
+// $pdo = DB::conectar();</span></pre>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 6: SELECT                                       -->
+      <!-- ====================================================== -->
+      <div id="s6" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">6</span>
+          Leer datos — SELECT
+        </h2>
+        <p class="text-muted mb-4">Los métodos de fetch y cuándo usar cada uno</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-bold">query() — Sin parámetros del usuario</h5>
+            <pre><span class="kw">$pdo</span> = <span class="cls">DB</span>::<span class="fn">conectar</span>();
+
+<span class="cmt">// Sin parámetros de usuario → query() está bien</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">query</span>(<span class="str">'SELECT * FROM productos ORDER BY nombre'</span>);
+
+<span class="cmt">// fetchAll → array de todas las filas</span>
+<span class="kw">$productos</span> = <span class="kw">$stmt</span>-><span class="fn">fetchAll</span>();
+<span class="cmt">// → [ ['id'=>1,'nombre'=>'Laptop',...], ['id'=>2,...] ]</span>
+
+<span class="cmt">// Recorrer con foreach</span>
+<span class="kw">foreach</span> (<span class="kw">$productos</span> <span class="kw">as</span> <span class="kw">$p</span>) {
+    <span class="fn">echo</span> <span class="kw">$p</span>[<span class="str">'nombre'</span>] . <span class="str">' → $'</span> . <span class="kw">$p</span>[<span class="str">'precio'</span>];
+}</pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">fetch() y fetchColumn()</h5>
+            <pre><span class="cmt">// fetch() → UNA sola fila (la primera)</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'SELECT * FROM productos WHERE id = ?'</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="num">1</span>]);
+<span class="kw">$producto</span> = <span class="kw">$stmt</span>-><span class="fn">fetch</span>();
+<span class="cmt">// → ['id'=>1,'nombre'=>'Laptop',...] o false si no existe</span>
+
+<span class="kw">if</span> (!<span class="kw">$producto</span>) {
+    <span class="fn">echo</span> <span class="str">'No encontrado'</span>;
+}
+
+<span class="cmt">// fetchColumn() → solo el primer valor escalar</span>
+<span class="kw">$total</span> = <span class="kw">$pdo</span>-><span class="fn">query</span>(<span class="str">'SELECT COUNT(*) FROM productos'</span>)
+              -><span class="fn">fetchColumn</span>();
+<span class="cmt">// → 10</span>
+
+<span class="cmt">// fetchAll(PDO::FETCH_COLUMN) → array simple</span>
+<span class="kw">$cats</span> = <span class="kw">$pdo</span>-><span class="fn">query</span>(<span class="str">'SELECT DISTINCT categoria FROM productos'</span>)
+             -><span class="fn">fetchAll</span>(<span class="cls">PDO</span>::<span class="num">FETCH_COLUMN</span>);
+<span class="cmt">// → ['Audio','Computadores','Monitores',...]</span></pre>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+          <div class="col-md-4 text-center">
+            <div class="p-3 rounded" style="background:#1e2a35">
+              <code class="inline">fetchAll()</code>
+              <div class="text-secondary small mt-1">Array con TODAS las filas. Usa para listas.</div>
+            </div>
+          </div>
+          <div class="col-md-4 text-center">
+            <div class="p-3 rounded" style="background:#1e2a35">
+              <code class="inline">fetch()</code>
+              <div class="text-secondary small mt-1">Solo la primera fila. Usa para "ver uno".</div>
+            </div>
+          </div>
+          <div class="col-md-4 text-center">
+            <div class="p-3 rounded" style="background:#1e2a35">
+              <code class="inline">fetchColumn()</code>
+              <div class="text-secondary small mt-1">Solo el primer valor. Usa con COUNT().</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 7: SQL INJECTION                               -->
+      <!-- ====================================================== -->
+      <div id="s7" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge bg-danger me-2">7</span>
+          SQL Injection — el ataque más peligroso
+        </h2>
+        <p class="text-muted mb-4">
+          Ocurre cuando un atacante inyecta código SQL en tu consulta.
+          Puede leer, modificar o borrar toda tu base de datos.
+        </p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <div class="compare-bad p-3">
+              <div class="fw-bold text-danger mb-2">❌ CÓDIGO VULNERABLE</div>
+              <pre style="background:transparent; padding:0; border:none"><span class="cmt">// El usuario escribe en un formulario:</span>
+<span class="cmt">// $_GET['id'] = "1 OR 1=1"</span>
+
+<span class="kw">$id</span> = <span class="kw">$_GET</span>[<span class="str">'id'</span>];   <span class="cmt">// "1 OR 1=1"</span>
+
+<span class="cmt">// Concatenar directamente es PELIGROSO:</span>
+<span class="kw">$sql</span> = <span class="str">"SELECT * FROM productos WHERE id = $id"</span>;
+
+<span class="cmt">// La consulta resultante es:
+// SELECT * FROM productos WHERE id = 1 OR 1=1
+//
+// 1=1 siempre es verdadero → devuelve TODOS los productos
+// El atacante accedió a datos que no debía ver.</span></pre>
+            </div>
+            <div class="box-danger p-3 mt-2">
+              <div class="text-danger fw-bold mb-1">Peor caso:</div>
+              <code class="inline" style="color:#ff7b72">'; DROP TABLE productos; --</code>
+              <div class="text-secondary small mt-1">Esto elimina toda la tabla si el código es vulnerable.</div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="compare-good p-3">
+              <div class="fw-bold text-success mb-2">✅ CÓDIGO SEGURO con PDO</div>
+              <pre style="background:transparent; padding:0; border:none"><span class="cmt">// El usuario sigue escribiendo "1 OR 1=1"</span>
+
+<span class="kw">$id</span> = <span class="kw">$_GET</span>[<span class="str">'id'</span>];   <span class="cmt">// "1 OR 1=1"</span>
+
+<span class="cmt">// Con Prepared Statement:</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'SELECT * FROM productos WHERE id = ?'</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="kw">$id</span>]);
+
+<span class="cmt">// PDO trata el valor "1 OR 1=1" como un string literal,
+// no como código SQL. La consulta enviada es:
+// SELECT * FROM productos WHERE id = '1 OR 1=1'
+//
+// → No devuelve nada (ningún id es "1 OR 1=1")
+// ¡El ataque falla completamente!</span></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="box-info p-3 mt-4">
+          <strong style="color:var(--db)">Regla de oro:</strong>
+          <span class="text-light">
+            Cualquier valor que venga de
+            <code class="inline">$_GET</code>, <code class="inline">$_POST</code> o de cualquier fuente externa
+            DEBE usarse con <strong>Prepared Statements</strong>. Nunca concatenes variables en SQL.
+          </span>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 8: Prepared Statements                         -->
+      <!-- ====================================================== -->
+      <div id="s8" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">8</span>
+          Prepared Statements — la forma segura
+        </h2>
+        <p class="text-muted mb-4">prepare() + execute() — el dúo dinámico de PDO</p>
+
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-bold">Parámetros posicionales (<code class="inline">?</code>)</h5>
+            <pre><span class="cmt">// El ? es el placeholder</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+    <span class="str">'SELECT * FROM productos
+      WHERE categoria = ?
+      AND precio &lt; ?'</span>
+);
+
+<span class="cmt">// execute() recibe un array con los valores
+// en el mismo orden que los ?</span>
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="str">'Periféricos'</span>, <span class="num">200000</span>]);
+
+<span class="kw">$resultados</span> = <span class="kw">$stmt</span>-><span class="fn">fetchAll</span>();</pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">Parámetros nombrados (<code class="inline">:nombre</code>)</h5>
+            <pre><span class="cmt">// Los :placeholders tienen nombre</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+    <span class="str">'INSERT INTO contactos (nombre, email, categoria)
+     VALUES (:nombre, :email, :categoria)'</span>
+);
+
+<span class="cmt">// execute() recibe un array asociativo</span>
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([
+    <span class="str">':nombre'</span>    => <span class="str">'Ana García'</span>,
+    <span class="str">':email'</span>     => <span class="str">'ana@mail.com'</span>,
+    <span class="str">':categoria'</span> => <span class="str">'Trabajo'</span>,
+]);</pre>
+          </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+          <div class="col-md-6">
+            <h5 class="fw-bold">bindValue() para LIMIT y OFFSET</h5>
+            <pre><span class="cmt">// Para LIMIT y OFFSET necesitas bindValue con PDO::PARAM_INT</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+    <span class="str">'SELECT * FROM productos LIMIT ? OFFSET ?'</span>
+);
+<span class="kw">$stmt</span>-><span class="fn">bindValue</span>(<span class="num">1</span>, <span class="num">10</span>, <span class="cls">PDO</span>::<span class="num">PARAM_INT</span>);
+<span class="kw">$stmt</span>-><span class="fn">bindValue</span>(<span class="num">2</span>, <span class="num">0</span>,  <span class="cls">PDO</span>::<span class="num">PARAM_INT</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>();</pre>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">rowCount() — filas afectadas</h5>
+            <pre><span class="cmt">// Después de UPDATE o DELETE:</span>
+<span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'DELETE FROM productos WHERE id = ?'</span>);
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="num">5</span>]);
+
+<span class="cmt">// ¿Cuántas filas se eliminaron?</span>
+<span class="kw">$afectadas</span> = <span class="kw">$stmt</span>-><span class="fn">rowCount</span>();
+<span class="cmt">// → 1 si existía, 0 si no existía</span>
+
+<span class="kw">if</span> (<span class="kw">$afectadas</span> === <span class="num">0</span>) {
+    <span class="fn">echo</span> <span class="str">'El producto no existía.'</span>;
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 9: INSERT                                       -->
+      <!-- ====================================================== -->
+      <div id="s9" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">9</span>
+          INSERT — Crear registros
+        </h2>
+        <p class="text-muted mb-4">Patrón completo: formulario → validar → insertar → redirigir</p>
+
+        <pre><span class="kw">&lt;?php</span>
+<span class="kw">if</span> (<span class="kw">$_SERVER</span>[<span class="str">'REQUEST_METHOD'</span>] === <span class="str">'POST'</span>) {
+
+    <span class="cmt">// 1. Recoger y limpiar</span>
+    <span class="kw">$nombre</span> = <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'nombre'</span>] ?? <span class="str">''</span>);
+    <span class="kw">$email</span>  = <span class="fn">trim</span>(<span class="kw">$_POST</span>[<span class="str">'email'</span>]  ?? <span class="str">''</span>);
+    <span class="kw">$precio</span> = <span class="kw">$_POST</span>[<span class="str">'precio'</span>] ?? <span class="str">''</span>;
+
+    <span class="cmt">// 2. Validar</span>
+    <span class="kw">$errores</span> = [];
+    <span class="kw">if</span> (<span class="fn">empty</span>(<span class="kw">$nombre</span>))                                   <span class="kw">$errores</span>[] = <span class="str">'Nombre obligatorio.'</span>;
+    <span class="kw">if</span> (!<span class="fn">filter_var</span>(<span class="kw">$email</span>, <span class="cls">FILTER_VALIDATE_EMAIL</span>))     <span class="kw">$errores</span>[] = <span class="str">'Email inválido.'</span>;
+    <span class="kw">if</span> (!<span class="fn">is_numeric</span>(<span class="kw">$precio</span>) || <span class="kw">$precio</span> < <span class="num">0</span>)            <span class="kw">$errores</span>[] = <span class="str">'Precio inválido.'</span>;
+
+    <span class="cmt">// 3. Si no hay errores, INSERT</span>
+    <span class="kw">if</span> (<span class="fn">empty</span>(<span class="kw">$errores</span>)) {
+        <span class="kw">try</span> {
+            <span class="kw">$pdo</span>  = <span class="cls">DB</span>::<span class="fn">conectar</span>();
+            <span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+                <span class="str">'INSERT INTO productos (nombre, email, precio)
+                 VALUES (:nombre, :email, :precio)'</span>
+            );
+            <span class="kw">$stmt</span>-><span class="fn">execute</span>([
+                <span class="str">':nombre'</span> => <span class="kw">$nombre</span>,
+                <span class="str">':email'</span>  => <span class="kw">$email</span>,
+                <span class="str">':precio'</span> => (<span class="kw">float</span>)<span class="kw">$precio</span>,
+            ]);
+
+            <span class="cmt">// lastInsertId() devuelve el ID auto_increment creado</span>
+            <span class="kw">$id</span> = <span class="kw">$pdo</span>-><span class="fn">lastInsertId</span>();
+
+            <span class="cmt">// 4. Patrón PRG: redirigir para evitar reenvío del form</span>
+            <span class="fn">header</span>(<span class="str">"Location: ver.php?id=$id"</span>);
+            <span class="fn">exit</span>;
+
+        } <span class="kw">catch</span> (<span class="cls">PDOException</span> <span class="kw">$e</span>) {
+            <span class="kw">$errores</span>[] = <span class="str">'Error al guardar.'</span>;
+        }
+    }
+}</pre>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 10: UPDATE                                      -->
+      <!-- ====================================================== -->
+      <div id="s10" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">10</span>
+          UPDATE — Actualizar registros
+        </h2>
+        <p class="text-muted mb-4">Siempre incluir <code class="inline">WHERE id = ?</code> — sin WHERE actualizas TODA la tabla</p>
+
+        <pre><span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(
+    <span class="str">'UPDATE productos
+     SET nombre   = :nombre,
+         precio   = :precio,
+         categoria = :categoria
+     WHERE id = :id'</span>
+);
+
+<span class="kw">$stmt</span>-><span class="fn">execute</span>([
+    <span class="str">':nombre'</span>    => <span class="str">'Laptop Pro'</span>,
+    <span class="str">':precio'</span>    => <span class="num">3200000</span>,
+    <span class="str">':categoria'</span> => <span class="str">'Computadores'</span>,
+    <span class="str">':id'</span>        => <span class="num">1</span>,   <span class="cmt">// ← SIEMPRE especifica el ID</span>
+]);
+
+<span class="cmt">// Verificar que se actualizó algo</span>
+<span class="kw">if</span> (<span class="kw">$stmt</span>-><span class="fn">rowCount</span>() === <span class="num">0</span>) {
+    <span class="fn">echo</span> <span class="str">'No se encontró el producto.'</span>;
+}</pre>
+
+        <div class="box-danger p-3 mt-3">
+          <strong class="text-danger">⚠ Cuidado:</strong>
+          <code class="inline" style="color:#ff7b72">UPDATE productos SET precio = 0</code>
+          <span class="text-light"> (sin WHERE) pone el precio de <em>todos</em> los productos a 0. Siempre filtra por ID.</span>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 11: DELETE                                      -->
+      <!-- ====================================================== -->
+      <div id="s11" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">11</span>
+          DELETE — Eliminar registros
+        </h2>
+        <p class="text-muted mb-4">Con confirmación previa y verificación con rowCount()</p>
+
+        <pre><span class="cmt">// Siempre pide confirmación antes de eliminar
+// Usa un formulario POST, no un simple enlace GET</span>
+
+<span class="kw">if</span> (<span class="kw">$_SERVER</span>[<span class="str">'REQUEST_METHOD'</span>] === <span class="str">'POST'</span> && <span class="fn">isset</span>(<span class="kw">$_POST</span>[<span class="str">'confirmar'</span>])) {
+
+    <span class="kw">$id</span> = <span class="fn">filter_input</span>(<span class="cls">INPUT_POST</span>, <span class="str">'id'</span>, <span class="cls">FILTER_VALIDATE_INT</span>);
+
+    <span class="kw">if</span> (<span class="kw">$id</span>) {
+        <span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'DELETE FROM productos WHERE id = ?'</span>);
+        <span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="kw">$id</span>]);
+
+        <span class="kw">if</span> (<span class="kw">$stmt</span>-><span class="fn">rowCount</span>() > <span class="num">0</span>) {
+            <span class="fn">header</span>(<span class="str">'Location: index.php?ok=delete'</span>);
+            <span class="fn">exit</span>;
+        }
+    }
+}
+
+<span class="cmt">// El formulario de confirmación se ve así:
+//
+// &lt;form method="POST"&gt;
+//   &lt;input type="hidden" name="id" value="5"&gt;
+//   &lt;button name="confirmar" value="1"&gt;Sí, eliminar&lt;/button&gt;
+//   &lt;a href="ver.php?id=5"&gt;Cancelar&lt;/a&gt;
+// &lt;/form&gt;</span></pre>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 12: Errores                                     -->
+      <!-- ====================================================== -->
+      <div id="s12" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">12</span>
+          Manejo de errores con try/catch
+        </h2>
+        <p class="text-muted mb-4">Cómo manejar PDOException correctamente</p>
+
+        <pre><span class="kw">try</span> {
+    <span class="kw">$pdo</span>  = <span class="cls">DB</span>::<span class="fn">conectar</span>();
+    <span class="kw">$stmt</span> = <span class="kw">$pdo</span>-><span class="fn">prepare</span>(<span class="str">'SELECT * FROM productos WHERE id = ?'</span>);
+    <span class="kw">$stmt</span>-><span class="fn">execute</span>([<span class="kw">$id</span>]);
+    <span class="kw">$producto</span> = <span class="kw">$stmt</span>-><span class="fn">fetch</span>();
+
+} <span class="kw">catch</span> (<span class="cls">PDOException</span> <span class="kw">$e</span>) {
+
+    <span class="cmt">// ── En DESARROLLO: muestra el error completo ──────────────</span>
+    <span class="fn">error_log</span>(<span class="str">'DB Error: '</span> . <span class="kw">$e</span>-><span class="fn">getMessage</span>());  <span class="cmt">// guarda en log</span>
+    <span class="fn">echo</span> <span class="str">'Debug: '</span> . <span class="kw">$e</span>-><span class="fn">getMessage</span>();          <span class="cmt">// solo en desarrollo</span>
+
+    <span class="cmt">// ── En PRODUCCIÓN: mensaje genérico ──────────────────────</span>
+    <span class="cmt">// $error = 'Ocurrió un error. Intenta más tarde.';
+    // No muestres $e->getMessage() al usuario final.</span>
+}
+
+<span class="cmt">// Información útil en el objeto PDOException:
+// $e->getMessage()  → descripción del error
+// $e->getCode()     → código SQL (ej: 23000 = clave duplicada)
+// $e->getFile()     → archivo donde ocurrió
+// $e->getLine()     → línea donde ocurrió</span></pre>
+
+        <div class="row g-3 mt-3">
+          <div class="col-md-6">
+            <h5 class="fw-bold">Errores comunes de MySQL</h5>
+            <table class="table table-sm table-bordered">
+              <thead class="table-dark"><tr><th>Código</th><th>Causa</th></tr></thead>
+              <tbody>
+                <tr><td><code class="inline">1062</code></td><td>Clave duplicada (UNIQUE)</td></tr>
+                <tr><td><code class="inline">1048</code></td><td>Campo NOT NULL con valor nulo</td></tr>
+                <tr><td><code class="inline">1452</code></td><td>Foreign key inválida</td></tr>
+                <tr><td><code class="inline">2002</code></td><td>MySQL no está activo</td></tr>
+                <tr><td><code class="inline">1045</code></td><td>Usuario/contraseña incorrectos</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h5 class="fw-bold">Detectar clave duplicada</h5>
+            <pre style="font-size:.78rem"><span class="kw">try</span> {
+    <span class="kw">$stmt</span>-><span class="fn">execute</span>([...]);
+} <span class="kw">catch</span> (<span class="cls">PDOException</span> <span class="kw">$e</span>) {
+    <span class="kw">if</span> (<span class="kw">$e</span>-><span class="fn">getCode</span>() == <span class="num">'23000'</span>) {
+        <span class="kw">$error</span> = <span class="str">'El email ya está registrado.'</span>;
+    } <span class="kw">else</span> {
+        <span class="kw">$error</span> = <span class="str">'Error de base de datos.'</span>;
+    }
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================== -->
+      <!-- SECCIÓN 13: Buenas prácticas                           -->
+      <!-- ====================================================== -->
+      <div id="s13" class="section card-section">
+        <h2 class="fw-bold mb-1">
+          <span class="badge badge-db me-2">13</span>
+          Buenas prácticas
+        </h2>
+        <p class="text-muted mb-4">Checklist para escribir código PHP + MySQL de calidad</p>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="p-3 rounded border border-success">
+              <div class="fw-bold text-success mb-2">✓ Siempre hacer</div>
+              <ul class="mb-0 text-muted small">
+                <li>Usar <strong>Prepared Statements</strong> con cualquier input del usuario</li>
+                <li>Escapar HTML con <code class="inline">htmlspecialchars()</code> al mostrar datos</li>
+                <li>Envolver en <strong>try/catch</strong> cada llamada a la BD</li>
+                <li>Validar y castear parámetros GET/POST</li>
+                <li>Usar <strong>Patrón PRG</strong> después de INSERT/UPDATE/DELETE</li>
+                <li>Confirmar antes de eliminar</li>
+                <li>Usar <code class="inline">utf8mb4</code> en el DSN y en la BD</li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="p-3 rounded border border-danger">
+              <div class="fw-bold text-danger mb-2">✗ Nunca hacer</div>
+              <ul class="mb-0 text-muted small">
+                <li>Concatenar variables en SQL: <code class="inline" style="color:#ff7b72">"WHERE id = $id"</code></li>
+                <li>Mostrar <code class="inline">$e->getMessage()</code> al usuario final</li>
+                <li>Guardar contraseñas en texto plano</li>
+                <li>Usar <code class="inline">root</code> sin contraseña en producción</li>
+                <li>UPDATE o DELETE sin <code class="inline">WHERE</code></li>
+                <li>Mostrar datos de la BD sin <code class="inline">htmlspecialchars()</code></li>
+                <li>Abrir múltiples conexiones en vez de reutilizar</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-4 rounded text-center" style="background:#0d1117; border:2px solid var(--db)">
+          <h4 class="fw-bold mb-3" style="color:var(--db2)">¿Listo para practicar?</h4>
+          <p class="text-secondary mb-3">
+            Explora la demo funcional y luego completa los 27 TODOs de la práctica.
+          </p>
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="demo/index.php" class="btn" style="background:var(--db); color:#fff">
+              <i class="fas fa-play me-1"></i> Ver Demo (CRUD real)
+            </a>
+            <a href="practica.html" class="btn btn-outline-warning">
+              <i class="fas fa-keyboard me-1"></i> Ir a la Práctica
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /col contenido -->
+  </div><!-- /row -->
+</div><!-- /container-fluid -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Sidebar: marcar sección activa al scroll
+const sections = document.querySelectorAll('.section');
+const links    = document.querySelectorAll('.nav-link-side');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            links.forEach(l => l.classList.remove('active'));
+            const active = document.querySelector(`.nav-link-side[href="#${entry.target.id}"]`);
+            if (active) active.classList.add('active');
+        }
+    });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
