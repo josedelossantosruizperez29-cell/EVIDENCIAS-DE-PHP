@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open World GTA Prototype</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { overflow: hidden; background: #000; font-family: 'Segoe UI', sans-serif; }
+        canvas { display: block; }
+        
+        #hud {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+        }
+        
+        #crosshair {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px; height: 20px;
+            display: none;
+        }
+        #crosshair::before, #crosshair::after {
+            content: ''; position: absolute; background: rgba(255,255,255,0.8);
+        }
+        #crosshair::before { width: 2px; height: 100%; left: 50%; transform: translateX(-50%); }
+        #crosshair::after { height: 2px; width: 100%; top: 50%; transform: translateY(-50%); }
+        
+        #ammoDisplay {
+            position: absolute; bottom: 30px; right: 30px;
+            color: #fff; font-size: 24px; font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            display: none;
+        }
+        
+        #healthBar {
+            position: absolute; bottom: 30px; left: 30px;
+            width: 200px; height: 12px; background: rgba(0,0,0,0.5);
+            border: 2px solid #fff; border-radius: 6px; overflow: hidden;
+        }
+        #healthFill {
+            width: 100%; height: 100%; background: linear-gradient(90deg, #ff4444, #44ff44);
+            transition: width 0.3s;
+        }
+        
+        #missionPanel {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.7); border: 2px solid #0ff;
+            padding: 15px 25px; border-radius: 8px; color: #0ff;
+            text-align: center; max-width: 500px;
+        }
+        #missionPanel h3 { margin-bottom: 8px; font-size: 18px; color: #fff; }
+        #missionPanel p { font-size: 14px; line-height: 1.4; }
+        #missionProgress {
+            margin-top: 10px; height: 6px; background: rgba(255,255,255,0.2);
+            border-radius: 3px; overflow: hidden;
+        }
+        #missionProgressFill {
+            width: 0%; height: 100%; background: #0ff; transition: width 0.5s;
+        }
+        
+        #timer {
+            position: absolute; top: 20px; right: 30px;
+            color: #f44; font-size: 28px; font-weight: bold;
+            display: none; text-shadow: 0 0 10px #f00;
+        }
+        
+        #minimap {
+            position: absolute; bottom: 20px; right: 20px;
+            width: 150px; height: 150px; background: rgba(0,50,0,0.7);
+            border: 3px solid #0a0; border-radius: 50%; overflow: hidden;
+        }
+        #minimapCanvas { width: 100%; height: 100%; }
+        
+        #controls {
+            position: absolute; top: 20px; left: 20px;
+            background: rgba(0,0,0,0.7); padding: 15px; border-radius: 8px;
+            color: #aaa; font-size: 12px; line-height: 1.6;
+        }
+        #controls kbd {
+            background: rgba(255,255,255,0.2); padding: 2px 6px;
+            border-radius: 3px; color: #fff;
+        }
+        
+        #messageOverlay {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9); padding: 40px 60px;
+            border-radius: 12px; text-align: center; display: none;
+        }
+        #messageOverlay h2 { font-size: 36px; margin-bottom: 15px; }
+        #messageOverlay p { font-size: 18px; color: #aaa; }
+        
+        #startScreen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 100;
+        }
+        #startScreen h1 {
+            font-size: 64px; color: #0ff; text-shadow: 0 0 30px #0ff;
+            margin-bottom: 20px; letter-spacing: 8px;
+        }
+        #startScreen p { color: #aaa; font-size: 18px; margin-bottom: 40px; }
+        #startScreen button {
+            padding: 15px 50px; font-size: 20px; background: #0ff;
+            border: none; border-radius: 8px; cursor: pointer;
+            color: #000; font-weight: bold; transition: all 0.3s;
+        }
+        #startScreen button:hover { background: #0aa; transform: scale(1.05); }
+        
+        .marker {
+            position: absolute; width: 10px; height: 10px;
+            background: #0ff; border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,255,255,0.5); }
+            50% { box-shadow: 0 0 0 15px rgba(0,255,255,0); }
+        }
+    </style>
+</head>
+<body>
+    <div id="startScreen">
+        <h1>GTA PROTO</h1>
+        <p>Prototipo de Mundo Abierto - Motor Browser Three.js</p>
+        <button id="startBtn">▶ INICIAR JUEGO</button>
+    </div>
+    
+    <div id="hud">
+        <div id="crosshair"></div>
+        <div id="ammoDisplay">🔫 <span id="ammoCurrent">12</span> / <span id="ammoMax">12</span></div>
+        <div id="healthBar"><div id="healthFill"></div></div>
+        <div id="missionPanel">
+            <h3 id="missionTitle">Misión Activa</h3>
+            <p id="missionDesc">Completando misiones...</p>
+            <div id="missionProgress"><div id="missionProgressFill"></div></div>
+        </div>
+        <div id="timer">⏱ 60s</div>
+        <div id="minimap"><canvas id="minimapCanvas" width="150" height="150"></canvas></div>
+        <div id="controls">
+            <kbd>WASD</kbd> Mover<br>
+            <kbd>SHIFT</kbd> Correr<br>
+            <kbd>E</kbd> Vehículo<br>
+            <kbd>ESPACIO</kbd> Salto<br>
+            <kbd>CLICK</kbd> Disparar<br>
+            <kbd>R</kbd> Recargar
+        </div>
+        <div id="messageOverlay">
+            <h2 id="messageTitle">¡Misión Completada!</h2>
+            <p id="messageDesc">Continuando al siguiente objetivo...</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // ============================================================
+        // GTA PROTOTYPE - Motor de Juego en Three.js
+        // Arquitecturas: Player, Vehicle, Weapon, Mission, City, NPC
+        // ============================================================
+
+        const GameState = {
+            isPlaying: false,
+            currentMission: 0,
+            missionComplete: [false, false],
+            freeRoam: false,
+            playerHealth: 100,
+            missionProgress: 0
+        };
+
+        // --- CONFIGURACIÓN DEL MUNDO ---
+        const WorldConfig = {
+            citySize: 400,
+            blockSize: 40,
+            roadWidth: 12,
+            buildingCount: 60,
+            npcSpawnCount: 20,
+            vehicleSpawnCount: 10
+        };
+
+        // --- ESCENA PRINCIPAL ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);
+        scene.fog = new THREE.Fog(0x87CEEB, 100, 300);
+
+        const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // --- ILUMINACIÓN ---
+        const ambientLight = new THREE.AmbientLight(0x666666, 0.5);
+        scene.add(ambientLight);
+
+        const sunLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        sunLight.position.set(50, 100, 50);
+        sunLight.castShadow = true;
+        sunLight.shadow.mapSize.set(2048, 2048);
+        sunLight.shadow.camera.left = -150;
+        sunLight.shadow.camera.right = 150;
+        sunLight.shadow.camera.top = 150;
+        sunLight.shadow.camera.bottom = -150;
+        scene.add(sunLight);
+
+        // --- SUELO ---
+        const groundGeo = new THREE.PlaneGeometry(WorldConfig.citySize * 2, WorldConfig.citySize * 2);
+        const groundMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // --- JUGADOR ---
+        const Player = {
+            mesh: null,
+            position: new THREE.Vector3(0, 2, 0),
+            velocity: new THREE.Vector3(),
+            isOnGround: true,
+            isRunning: false,
+            inVehicle: null,
+            cameraAngle: 0,
+            cameraPitch: 0.5,
+            cameraDistance: 8,
+            health: 100,
+            speed: 8,
+            runSpeed: 14,
+            jumpForce: 12
+        };
+
+        function createPlayer() {
+            const playerGroup = new THREE.Group();
+            
+            // Cuerpo
+            const bodyGeo = new THREE.CapsuleGeometry(0.5, 1, 4, 8);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x4488ff });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.castShadow = true;
+            playerGroup.add(body);
+            
+            // Cabeza
+            const headGeo = new THREE.SphereGeometry(0.35, 8, 8);
+            const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.y = 1.1;
+            head.castShadow = true;
+            playerGroup.add(head);
+            
+            scene.add(playerGroup);
+            Player.mesh = playerGroup;
+        }
+
+        // --- SISTEMA DE VEHÍCULOS ---
+        const vehicles = [];
+
+        const VehicleData = {
+            sedan: { color: 0xff4444, speed: 25, accel: 15, handling: 0.8 },
+            truck: { color: 0x4444ff, speed: 18, accel: 10, handling: 0.6 },
+            sports: { color: 0xffff00, speed: 35, accel: 20, handling: 0.9 }
+        };
+
+        function createVehicle(type, position) {
+            const data = VehicleData[type] || VehicleData.sedan;
+            const vehicleGroup = new THREE.Group();
+            
+            // Chasis
+            const chassisGeo = new THREE.BoxGeometry(2, 0.8, 4);
+            const chassisMat = new THREE.MeshStandardMaterial({ color: data.color });
+            const chassis = new THREE.Mesh(chassisGeo, chassisMat);
+            chassis.position.y = 0.6;
+            chassis.castShadow = true;
+            vehicleGroup.add(chassis);
+            
+            // Techo
+            const roofGeo = new THREE.BoxGeometry(1.6, 0.6, 2);
+            const roofMat = new THREE.MeshStandardMaterial({ color: data.color * 0.8 });
+            const roof = new THREE.Mesh(roofGeo, roofMat);
+            roof.position.y = 1.3;
+            roof.position.z = -0.3;
+            roof.castShadow = true;
+            vehicleGroup.add(roof);
+            
+            // Ruedas
+            const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 12);
+            const wheelMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
+            const wheelPositions = [
+                [-1, 0.4, 1.2], [1, 0.4, 1.2], [-1, 0.4, -1.2], [1, 0.4, -1.2]
+            ];
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(...pos);
+                wheel.castShadow = true;
+                vehicleGroup.add(wheel);
+            });
+            
+            vehicleGroup.position.copy(position);
+            scene.add(vehicleGroup);
+            
+            return {
+                mesh: vehicleGroup,
+                type: type,
+                position: position.clone(),
+                rotation: 0,
+                speed: 0,
+                maxSpeed: data.speed,
+                acceleration: data.accel,
+                handling: data.handling,
+                health: 100,
+                isEngineOn: false,
+                steerAngle: 0
+            };
+        }
+
+        function spawnVehicles() {
+            const types = ['sedan', 'truck', 'sports'];
+            for (let i = 0; i < WorldConfig.vehicleSpawnCount; i++) {
+                const type = types[Math.floor(Math.random() * types.length)];
+                const x = (Math.random() - 0.5) * WorldConfig.citySize;
+                const z = (Math.random() - 0.5) * WorldConfig.citySize;
+                const pos = new THREE.Vector3(x, 0, z);
+                vehicles.push(createVehicle(type, pos));
+            }
+        }
+
+        function findNearestVehicle() {
+            let nearest = null;
+            let minDist = Infinity;
+            const playerPos = Player.inVehicle ? Player.inVehicle.position : Player.position;
+            
+            vehicles.forEach(vehicle => {
+                const dist = playerPos.distanceTo(vehicle.position);
+                if (dist < minDist && dist < 5) {
+                    minDist = dist;
+                    nearest = vehicle;
+                }
+            });
+            return nearest;
+        }
+
+        function enterVehicle(vehicle) {
+            Player.inVehicle = vehicle;
+            vehicle.isEngineOn = true;
+            Player.mesh.visible = false;
+            
+            showMessage("🚗 Vehículo", "Presiona WASD para conducir, ESPACIO para freno de mano");
+        }
+
+        function exitVehicle() {
+            if (!Player.inVehicle) return;
+            
+            const vehicle = Player.inVehicle;
+            const exitPos = vehicle.position.clone();
+            exitPos.x += Math.sin(vehicle.rotation) * 2.5;
+            exitPos.z += Math.cos(vehicle.rotation) * 2.5;
+            
+            Player.position.copy(exitPos);
+            Player.position.y = 2;
+            Player.velocity.set(0, 0, 0);
+            Player.mesh.visible = true;
+            Player.mesh.position.copy(Player.position);
+            
+            vehicle.isEngineOn = false;
+            vehicle.speed = 0;
+            Player.inVehicle = null;
+        }
+
+        function updateVehicle(dt) {
+            if (!Player.inVehicle || !Player.inVehicle.isEngineOn) return;
+            
+            const vehicle = Player.inVehicle;
+            const accelInput = Input.keys['KeyW'] ? 1 : (Input.keys['KeyS'] ? -1 : 0);
+            const steerInput = Input.keys['KeyA'] ? 1 : (Input.keys['KeyD'] ? -1 : 0);
+            const handbrake = Input.keys['Space'] || false;
+            
+            // Aceleración
+            if (accelInput !== 0) {
+                vehicle.speed += accelInput * vehicle.acceleration * dt;
+                vehicle.speed = Math.max(-vehicle.maxSpeed * 0.3, Math.min(vehicle.maxSpeed, vehicle.speed));
+            } else {
+                vehicle.speed *= 0.98; // Fricción
+            }
+            
+            if (handbrake) {
+                vehicle.speed *= 0.95;
+            }
+            
+            // Dirección
+            if (Math.abs(vehicle.speed) > 0.5) {
+                vehicle.rotation += steerInput * vehicle.handling * dt * (vehicle.speed / vehicle.maxSpeed) * 2;
+            }
+            
+            // Movimiento
+            vehicle.position.x += Math.sin(vehicle.rotation) * vehicle.speed * dt;
+            vehicle.position.z += Math.cos(vehicle.rotation) * vehicle.speed * dt;
+            
+            // Actualizar mesh
+            vehicle.mesh.position.copy(vehicle.position);
+            vehicle.mesh.rotation.y = vehicle.rotation;
+            
+            // Actualizar posición del jugador
+            Player.position.copy(vehicle.position);
+            
+            // Verificar vuelco
+            if (vehicle.health <= 0 || Math.abs(vehicle.speed) > vehicle.maxSpeed * 1.5) {
+                exitVehicle();
+            }
+        }
+
+        // --- SISTEMA DE DISPARO ---
+        const Weapon = {
+            ammo: 12,
+            maxAmmo: 12,
+            totalAmmo: 60,
+            fireRate: 0.2,
+            lastFire: 0,
+            isFiring: false,
+            recoil: 0
+        };
+
+        function shoot() {
+            if (Player.inVehicle || Weapon.ammo <= 0) return;
+            if (performance.now() - Weapon.lastFire < Weapon.fireRate * 1000) return;
+            
+            Weapon.lastFire = performance.now();
+            Weapon.ammo--;
+            updateAmmoUI();
+            
+            // Retroceso visual
+            Weapon.recoil = 0.1;
+            
+            // Raycast
+            const raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+            
+            // Verificar NPCs
+            npcs.forEach(npc => {
+                const intersects = raycaster.intersectObject(npc.mesh, true);
+                if (intersects.length > 0 && intersects[0].distance < 100) {
+                    npc.health -= 35;
+                    createHitEffect(intersects[0].point);
+                    
+                    if (npc.health <= 0) {
+                        npc.isDead = true;
+                        npc.mesh.visible = false;
+                        
+                        // Verificar misión de neutralización
+                        if (GameState.currentMission === 2) {
+                            GameState.missionProgress++;
+                            updateMissionUI();
+                            
+                            if (GameState.missionProgress >= 3) {
+                                startEscapeTimer();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function reload() {
+            if (Weapon.totalAmmo > 0 && Weapon.ammo < Weapon.maxAmmo) {
+                const needed = Weapon.maxAmmo - Weapon.ammo;
+                const available = Math.min(needed, Weapon.totalAmmo);
+                Weapon.ammo += available;
+                Weapon.totalAmmo -= available;
+                updateAmmoUI();
+                showMessage("🔄 Recarga", `Munición: ${Weapon.ammo}/${Weapon.maxAmmo}`);
+            }
+        }
+
+        function updateAmmoUI() {
+            document.getElementById('ammoCurrent').textContent = Weapon.ammo;
+            document.getElementById('ammoMax').textContent = Weapon.maxAmmo;
+        }
+
+        function createHitEffect(position) {
+            const effectGeo = new THREE.SphereGeometry(0.1, 6, 6);
+            const effectMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const effect = new THREE.Mesh(effectGeo, effectMat);
+            effect.position.copy(position);
+            scene.add(effect);
+            
+            setTimeout(() => scene.remove(effect), 200);
+        }
+
+        // --- SISTEMA DE NPCS ---
+        const npcs = [];
+        const npcMeshes = [];
+
+        function createNPC(position) {
+            const npcGroup = new THREE.Group();
+            
+            // Cuerpo
+            const bodyGeo = new THREE.CapsuleGeometry(0.4, 0.9, 4, 6);
+            const colors = [0xff6644, 0x66ff44, 0x4466ff, 0xff44ff, 0xffff44];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const bodyMat = new THREE.MeshStandardMaterial({ color });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.castShadow = true;
+            npcGroup.add(body);
+            
+            // Cabeza
+            const headGeo = new THREE.SphereGeometry(0.25, 6, 6);
+            const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.y = 0.9;
+            head.castShadow = true;
+            npcGroup.add(head);
+            
+            npcGroup.position.copy(position);
+            scene.add(npcGroup);
+            
+            return {
+                mesh: npcGroup,
+                position: position.clone(),
+                velocity: new THREE.Vector3(),
+                health: 100,
+                isDead: false,
+                isHostile: false,
+                wanderTarget: null,
+                wanderTimer: 0,
+                state: 'idle'
+            };
+        }
+
+        function spawnNPCs() {
+            for (let i = 0; i < WorldConfig.npcSpawnCount; i++) {
+                const x = (Math.random() - 0.5) * WorldConfig.citySize * 0.8;
+                const z = (Math.random() - 0.5) * WorldConfig.citySize * 0.8;
+                const pos = new THREE.Vector3(x, 0, z);
+                npcs.push(createNPC(pos));
+            }
+        }
+
+        function updateNPCs(dt) {
+            npcs.forEach(npc => {
+                if (npc.isDead) return;
+                
+                npc.wanderTimer -= dt;
+                if (npc.wanderTimer <= 0 || !npc.wanderTarget) {
+                    npc.wanderTarget = new THREE.Vector3(
+                        npc.position.x + (Math.random() - 0.5) * 30,
+                        0,
+                        npc.position.z + (Math.random() - 0.5) * 30
+                    );
+                    npc.wanderTimer = 3 + Math.random() * 4;
+                }
+                
+                const direction = npc.wanderTarget.clone().sub(npc.position).normalize();
+                npc.velocity.x = direction.x * 2;
+                npc.velocity.z = direction.z * 2;
+                
+                npc.position.x += npc.velocity.x * dt;
+                npc.position.z += npc.velocity.z * dt;
+                npc.position.y = 0;
+                
+                npc.mesh.position.copy(npc.position);
+                
+                // Rotar hacia dirección de movimiento
+                if (direction.length() > 0.1) {
+                    npc.mesh.rotation.y = Math.atan2(direction.x, direction.z);
+                }
+            });
+        }
+
+        // --- CIUDAD ---
+        const buildings = [];
+
+        function generateCity() {
+            const halfSize = WorldConfig.citySize / 2;
+            const blockSize = WorldConfig.blockSize;
+            const roadWidth = WorldConfig.roadWidth;
+            
+            // Calles (líneas en el suelo)
+            for (let i = -halfSize; i <= halfSize; i += blockSize) {
+                // Calles horizontales
+                const roadGeoH = new THREE.PlaneGeometry(WorldConfig.citySize, roadWidth);
+                const roadMatH = new THREE.MeshStandardMaterial({ color: 0x333333 });
+                const roadH = new THREE.Mesh(roadGeoH, roadMatH);
+                roadH.rotation.x = -Math.PI / 2;
+                roadH.position.set(0, 0.01, i);
+                scene.add(roadH);
+                
+                // Calles verticales
+                const roadGeoV = new THREE.PlaneGeometry(roadWidth, WorldConfig.citySize);
+                const roadMatV = new THREE.MeshStandardMaterial({ color: 0x333333 });
+                const roadV = new THREE.Mesh(roadGeoV, roadMatV);
+                roadV.rotation.x = -Math.PI / 2;
+                roadV.position.set(i, 0.01, 0);
+                scene.add(roadV);
+            }
+            
+            // Edificios
+            const buildingMaterials = [
+                new THREE.MeshStandardMaterial({ color: 0x888888 }),
+                new THREE.MeshStandardMaterial({ color: 0x667788 }),
+                new THREE.MeshStandardMaterial({ color: 0x998877 }),
+                new THREE.MeshStandardMaterial({ color: 0x776655 }),
+                new THREE.MeshStandardMaterial({ color: 0x556677 })
+            ];
+            
+            for (let bx = -halfSize + blockSize/2; bx < halfSize; bx += blockSize) {
+                for (let bz = -halfSize + blockSize/2; bz < halfSize; bz += blockSize) {
+                    // Solo algunos bloques tienen edificios
+                    if (Math.random() < 0.7) {
+                        const width = 8 + Math.random() * 15;
+                        const depth = 8 + Math.random() * 15;
+                        const height = 5 + Math.random() * 25;
+                        
+                        const buildGeo = new THREE.BoxGeometry(width, height, depth);
+                        const buildMat = buildingMaterials[Math.floor(Math.random() * buildingMaterials.length)];
+                        const building = new THREE.Mesh(buildGeo, buildMat);
+                        
+                        building.position.set(
+                            bx + (Math.random() - 0.5) * 10,
+                            height / 2,
+                            bz + (Math.random() - 0.5) * 10
+                        );
+                        building.castShadow = true;
+                        building.receiveShadow = true;
+                        scene.add(building);
+                        
+                        // Ventanas
+                        const windowMat = new THREE.MeshStandardMaterial({ 
+                            color: 0xaaddff, 
+                            emissive: 0x224466,
+                            emissiveIntensity: 0.3
+                        });
+                        
+                        for (let wy = 2; wy < height - 2; wy += 3) {
+                            for (let wx = -width/2 + 2; wx < width/2; wx += 3) {
+                                const winGeo = new THREE.PlaneGeometry(1, 1.5);
+                                const win = new THREE.Mesh(winGeo, windowMat);
+                                win.position.set(
+                                    building.position.x + wx,
+                                    wy,
+                                    building.position.z + depth/2 + 0.01
+                                );
+                                scene.add(win);
+                            }
+                        }
+                        
+                        buildings.push(building);
+                    }
+                }
+            }
+            
+            // Faroles
+            for (let i = -halfSize + 10; i < halfSize; i += 40) {
+                for (let j = -halfSize + 10; j < halfSize; j += 40) {
+                    if (Math.random() < 0.3) {
+                        createStreetLight(i, j);
+                    }
+                }
+            }
+        }
+
+        function createStreetLight(x, z) {
+            const poleGeo = new THREE.CylinderGeometry(0.1, 0.1, 6, 6);
+            const poleMat = new THREE.MeshStandardMaterial({ color: 0x444444 });
+            const pole = new THREE.Mesh(poleGeo, poleMat);
+            pole.position.set(x, 3, z);
+            pole.castShadow = true;
+            scene.add(pole);
+            
+            const lightGeo = new THREE.SphereGeometry(0.3, 6, 6);
+            const lightMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffffaa, 
+                emissive: 0xffaa00, 
+                emissiveIntensity: 0.5 
+            });
+            const light = new THREE.Mesh(lightGeo, lightMat);
+            light.position.set(x, 6.3, z);
+            scene.add(light);
+        }
+
+        // --- SISTEMA DE MISIONES ---
+        const Missions = {
+            1: {
+                title: "Misión 1: Recolección",
+                description: "Dirígete al marcador verde. Recoge el paquete y llévalo en vehículo a la zona segura.",
+                steps: [
+                    { type: 'goTo', position: new THREE.Vector3(50, 0, 50), desc: "Ve al punto de recolección" },
+                    { type: 'collect', desc: "Recoge el paquete (E)" },
+                    { type: 'drive', position: new THREE.Vector3(-60, 0, -60), desc: "Conduce a la zona segura" }
+                ]
+            },
+            2: {
+                title: "Misión 2: Neutralización",
+                description: "Elimina 3 objetivos hostiles en el perímetro. Luego escapa en 60 segundos.",
+                steps: [
+                    { type: 'goTo', position: new THREE.Vector3(-80, 0, 80), desc: "Ve al perímetro de combate" },
+                    { type: 'eliminate', count: 3, desc: "Elimina 3 objetivos hostiles" },
+                    { type: 'escape', time: 60, desc: "¡Escapa del área!" }
+                ]
+            }
+        };
+
+        const missionMarkers = [];
+        let currentMissionStep = 0;
+        let hasPackage = false;
+        let escapeTimer = 0;
+        let isEscaping = false;
+
+        function setupMission(missionId) {
+            const mission = Missions[missionId];
+            currentMissionStep = 0;
+            GameState.missionProgress = 0;
+            
+            // Limpiar marcadores anteriores
+            missionMarkers.forEach(m => scene.remove(m));
+            missionMarkers.length = 0;
+            
+            // Crear marcadores visuales
+            mission.steps.forEach((step, idx) => {
+                if (step.position) {
+                    const markerGeo = new THREE.CylinderGeometry(0.5, 0.5, 20, 8);
+                    const markerMat = new THREE.MeshBasicMaterial({ 
+                        color: idx === 0 ? 0x00ff00 : 0xffff00,
+                        transparent: true,
+                        opacity: 0.3
+                    });
+                    const marker = new THREE.Mesh(markerGeo, markerMat);
+                    marker.position.copy(step.position);
+                    marker.position.y = 10;
+                    scene.add(marker);
+                    missionMarkers.push(marker);
+                }
+            });
+            
+            // Si es misión 2, crear NPCs hostiles
+            if (missionId === 2) {
+                for (let i = 0; i < 5; i++) {
+                    const x = -80 + (Math.random() - 0.5) * 40;
+                    const z = 80 + (Math.random() - 0.5) * 40;
+                    const hostile = createNPC(new THREE.Vector3(x, 0, z));
+                    hostile.isHostile = true;
+                    hostile.mesh.children[0].material.color.setHex(0xff0000);
+                    npcs.push(hostile);
+                }
+            }
+            
+            updateMissionUI();
+        }
+
+        function updateMissionUI() {
+            const missionId = GameState.currentMission;
+            if (missionId === 0 || GameState.freeRoam) {
+                document.getElementById('missionPanel').style.display = 'none';
+                return;
+            }
+            
+            const mission = Missions[missionId];
+            document.getElementById('missionPanel').style.display = 'block';
+            document.getElementById('missionTitle').textContent = mission.title;
+            document.getElementById('missionDesc').textContent = mission.steps[currentMissionStep]?.desc || "Completada";
+            
+            const progress = ((currentMissionStep + 1) / mission.steps.length) * 100;
+            document.getElementById('missionProgressFill').style.width = progress + '%';
+        }
+
+        function advanceMissionStep() {
+            const mission = Missions[GameState.currentMission];
+            currentMissionStep++;
+            
+            if (currentMissionStep >= mission.steps.length) {
+                // Misión completada
+                completeMission();
+            } else {
+                updateMissionUI();
+            }
+        }
+
+        function completeMission() {
+            GameState.missionComplete[GameState.currentMission - 1] = true;
+            
+            if (GameState.currentMission === 2) {
+                // Activar mundo libre
+                GameState.freeRoam = true;
+                document.getElementById('missionPanel').style.display = 'none';
+                showMessage("🌆 Mundo Abierto", "¡Misiones completadas! Explora libremente.");
+            } else {
+                showMessage("✅ Misión Completada", "Preparando siguiente misión...");
+                setTimeout(() => {
+                    GameState.currentMission++;
+                    setupMission(GameState.currentMission);
+                    showMessage(Missions[GameState.currentMission].title, Missions[GameState.currentMission].description);
+                }, 3000);
+            }
+            
+            // Limpiar marcadores
+            missionMarkers.forEach(m => scene.remove(m));
+            missionMarkers.length = 0;
+        }
+
+        function checkMissionProgress() {
+            if (GameState.currentMission === 0 || GameState.freeRoam) return;
+            
+            const mission = Missions[GameState.currentMission];
+            const step = mission.steps[currentMissionStep];
+            if (!step) return;
+            
+            const playerPos = Player.inVehicle ? Player.inVehicle.position : Player.position;
+            
+            if (step.type === 'goTo') {
+                const dist = playerPos.distanceTo(step.position);
+                if (dist < 5) {
+                    if (currentMissionStep === 1) {
+                        hasPackage = true;
+                    }
+                    advanceMissionStep();
+                }
+            }
+            
+            if (step.type === 'collect' && hasPackage && Input.keys['KeyE']) {
+                advanceMissionStep();
+            }
+            
+            if (step.type === 'drive') {
+                const dist = playerPos.distanceTo(step.position);
+                if (dist < 8 && Player.inVehicle) {
+                    advanceMissionStep();
+                }
+            }
+        }
+
+        function startEscapeTimer() {
+            isEscaping = true;
+            escapeTimer = 60;
+            document.getElementById('timer').style.display = 'block';
+            showMessage("⚠️ ¡ESCAPA!", "Tienes 60 segundos para huir del área.");
+        }
+
+        function updateEscapeTimer(dt) {
+            if (!isEscaping) return;
+            
+            escapeTimer -= dt;
+            document.getElementById('timer').textContent = `⏱ ${Math.ceil(escapeTimer)}s`;
+            
+            // Verificar si escapó
+            const playerPos = Player.inVehicle ? Player.inVehicle.position : Player.position;
+            const escapeZone = new THREE.Vector3(-80, 0, 80);
+            
+            if (playerPos.distanceTo(escapeZone) > 100 || escapeTimer <= 0) {
+                if (escapeTimer > 0) {
+                    document.getElementById('timer').style.display = 'none';
+                    isEscaping = false;
+                    advanceMissionStep();
+                } else {
+                    showMessage("❌ Misión Fallida", "Se acabó el tiempo.");
+                    setTimeout(() => {
+                        // Reiniciar posición
+                        Player.position.set(0, 2, 0);
+                        if (Player.inVehicle) exitVehicle();
+                        setupMission(2);
+                    }, 2000);
+                }
+            }
+        }
+
+        function showMessage(title, desc) {
+            const overlay = document.getElementById('messageOverlay');
+            document.getElementById('messageTitle').textContent = title;
+            document.getElementById('messageDesc').textContent = desc;
+            overlay.style.display = 'block';
+            
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 3000);
+        }
+
+        // --- INPUT ---
+        const Input = {
+            keys: {},
+            mouse: { x: 0, y: 0, locked: false }
+        };
+
+        document.addEventListener('keydown', (e) => {
+            Input.keys[e.code] = true;
+            
+            if (e.code === 'KeyE') {
+                if (Player.inVehicle) {
+                    exitVehicle();
+                } else {
+                    const vehicle = findNearestVehicle();
+                    if (vehicle) enterVehicle(vehicle);
+                }
+            }
+            
+            if (e.code === 'KeyR') {
+                reload();
+            }
+            
+            if (e.code === 'KeyE' && GameState.currentMission > 0 && !GameState.freeRoam) {
+                checkMissionProgress();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            Input.keys[e.code] = false;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (document.pointerLockElement) {
+                Player.cameraAngle -= e.movementX * 0.003;
+                Player.cameraPitch += e.movementY * 0.003;
+                Player.cameraPitch = Math.max(-1, Math.min(1, Player.cameraPitch));
+            }
+        });
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.button === 0 && document.pointerLockElement) {
+                shoot();
+            }
+        });
+
+        // --- MINIMAPA ---
+        const minimapCanvas = document.getElementById('minimapCanvas');
+        const minimapCtx = minimapCanvas.getContext('2d');
+
+        function updateMinimap() {
+            minimapCtx.fillStyle = 'rgba(0, 50, 0, 0.8)';
+            minimapCtx.fillRect(0, 0, 150, 150);
+            
+            const scale = 0.3;
+            const offsetX = 75;
+            const offsetZ = 75;
+            
+            // Edificios
+            minimapCtx.fillStyle = 'rgba(100, 100, 100, 0.6)';
+            buildings.forEach(b => {
+                const x = b.position.x * scale + offsetX;
+                const z = b.position.z * scale + offsetZ;
+                minimapCtx.fillRect(x - 3, z - 3, 6, 6);
+            });
+            
+            // NPCs
+            npcs.forEach(npc => {
+                if (npc.isDead) return;
+                minimapCtx.fillStyle = npc.isHostile ? '#ff4444' : '#44ff44';
+                const x = npc.position.x * scale + offsetX;
+                const z = npc.position.z * scale + offsetZ;
+                minimapCtx.fillRect(x - 1, z - 1, 2, 2);
+            });
+            
+            // Jugador
+            minimapCtx.fillStyle = '#ffffff';
+            minimapCtx.beginPath();
+            minimapCtx.arc(offsetX, offsetZ, 4, 0, Math.PI * 2);
+            minimapCtx.fill();
+            
+            // Dirección del jugador
+            minimapCtx.strokeStyle = '#ffffff';
+            minimapCtx.lineWidth = 2;
+            minimapCtx.beginPath();
+            minimapCtx.moveTo(offsetX, offsetZ);
+            minimapCtx.lineTo(
+                offsetX + Math.sin(Player.cameraAngle) * 8,
+                offsetZ + Math.cos(Player.cameraAngle) * 8
+            );
+            minimapCtx.stroke();
+            
+            // Marcadores de misión
+            if (GameState.currentMission > 0 && !GameState.freeRoam) {
+                const mission = Missions[GameState.currentMission];
+                const step = mission.steps[currentMissionStep];
+                if (step && step.position) {
+                    minimapCtx.fillStyle = '#00ffff';
+                    minimapCtx.beginPath();
+                    minimapCtx.arc(
+                        step.position.x * scale + offsetX,
+                        step.position.z * scale + offsetZ,
+                        3, 0, Math.PI * 2
+                    );
+                    minimapCtx.fill();
+                }
+            }
+            
+            // Vehículos
+            vehicles.forEach(v => {
+                minimapCtx.fillStyle = '#ffff00';
+                const x = v.position.x * scale + offsetX;
+                const z = v.position.z * scale + offsetZ;
+                minimapCtx.fillRect(x - 2, z - 2, 4, 4);
+            });
+        }
+
+        // --- CÁMARA ---
+        function updateCamera() {
+            const target = Player.inVehicle ? Player.inVehicle.position : Player.position;
+            
+            const camDist = Player.inVehicle ? 15 : Player.cameraDistance;
+            const camX = target.x - Math.sin(Player.cameraAngle) * Math.cos(Player.cameraPitch) * camDist;
+            const camY = target.y + Math.sin(Player.cameraPitch) * camDist + (Player.inVehicle ? 5 : 3);
+            const camZ = target.z - Math.cos(Player.cameraAngle) * Math.cos(Player.cameraPitch) * camDist;
+            
+            camera.position.set(camX, camY, camZ);
+            camera.lookAt(target.x, target.y + (Player.inVehicle ? 2 : 2), target.z);
+            
+            // Crosshair
+            document.getElementById('crosshair').style.display = 
+                (!Player.inVehicle) ? 'block' : 'none';
+            
+            // Ammo display
+            document.getElementById('ammoDisplay').style.display = 
+                (!Player.inVehicle) ? 'block' : 'none';
+        }
+
+        // --- ACTUALIZACIÓN DEL JUGADOR ---
+        function updatePlayer(dt) {
+            if (Player.inVehicle) return;
+            
+            const speed = Input.keys['ShiftLeft'] || Input.keys['ShiftRight'] ? Player.runSpeed : Player.speed;
+            
+            let moveX = 0;
+            let moveZ = 0;
+            
+            if (Input.keys['KeyW']) moveZ -= 1;
+            if (Input.keys['KeyS']) moveZ += 1;
+            if (Input.keys['KeyA']) moveX -= 1;
+            if (Input.keys['KeyD']) moveX += 1;
+            
+            // Normalizar movimiento
+            const length = Math.sqrt(moveX * moveX + moveZ * moveZ);
+            if (length > 0) {
+                moveX /= length;
+                moveZ /= length;
+            }
+            
+            // Rotar movimiento según cámara
+            const rotatedX = moveX * Math.cos(Player.cameraAngle) - moveZ * Math.sin(Player.cameraAngle);
+            const rotatedZ = moveX * Math.sin(Player.cameraAngle) + moveZ * Math.cos(Player.cameraAngle);
+            
+            Player.velocity.x = rotatedX * speed;
+            Player.velocity.z = rotatedZ * speed;
+            
+            // Salto
+            if (Input.keys['Space'] && Player.isOnGround) {
+                Player.velocity.y = Player.jumpForce;
+                Player.isOnGround = false;
+            }
+            
+            // Gravedad
+            Player.velocity.y -= 30 * dt;
+            
+            // Aplicar movimiento
+            Player.position.x += Player.velocity.x * dt;
+            Player.position.z += Player.velocity.z * dt;
+            Player.position.y += Player.velocity.y * dt;
+            
+            // Colisión con suelo
+            if (Player.position.y <= 2) {
+                Player.position.y = 2;
+                Player.velocity.y = 0;
+                Player.isOnGround = true;
+            }
+            
+            // Colisión con edificios
+            buildings.forEach(building => {
+                const box = new THREE.Box3().setFromObject(building);
+                const playerBox = new THREE.Box3(
+                    new THREE.Vector3(Player.position.x - 0.5, Player.position.y - 1, Player.position.z - 0.5),
+                    new THREE.Vector3(Player.position.x + 0.5, Player.position.y + 1, Player.position.z + 0.5)
+                );
+                
+                if (box.intersectsBox(playerBox)) {
+                    // Empujar fuera
+                    const center = box.getCenter(new THREE.Vector3());
+                    const pushDir = Player.position.clone().sub(center).normalize();
+                    Player.position.add(pushDir.multiplyScalar(0.1));
+                }
+            });
+            
+            // Actualizar mesh
+            Player.mesh.position.copy(Player.position);
+            Player.mesh.rotation.y = Player.cameraAngle;
+            
+            // Verificar proximidad a vehículos
+            const nearVehicle = findNearestVehicle();
+            if (nearVehicle) {
+                // Indicador visual (se maneja en UI)
+            }
+        }
+
+        // --- LOOP PRINCIPAL ---
+        let lastTime = performance.now();
+
+        function gameLoop() {
+            if (!GameState.isPlaying) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+            
+            const now = performance.now();
+            const dt = Math.min((now - lastTime) / 1000, 0.1);
+            lastTime = now;
+            
+            updatePlayer(dt);
+            updateVehicle(dt);
+            updateNPCs(dt);
+            updateCamera();
+            updateEscapeTimer(dt);
+            checkMissionProgress();
+            updateMinimap();
+            
+            // Animar marcadores de misión
+            missionMarkers.forEach((marker, idx) => {
+                marker.rotation.y += dt * 2;
+                marker.position.y = 10 + Math.sin(now * 0.002) * 2;
+            });
+            
+            renderer.render(scene, camera);
+            requestAnimationFrame(gameLoop);
+        }
+
+        // --- INICIAR JUEGO ---
+        document.getElementById('startBtn').addEventListener('click', () => {
+            document.getElementById('startScreen').style.display = 'none';
+            document.body.requestPointerLock();
+            GameState.isPlaying = true;
+            
+            // Iniciar primera misión
+            GameState.currentMission = 1;
+            setupMission(1);
+        });
+
+        document.addEventListener('pointerlockchange', () => {
+            Input.mouse.locked = !!document.pointerLockElement;
+        });
+
+        document.addEventListener('click', () => {
+            if (GameState.isPlaying && !document.pointerLockElement) {
+                document.body.requestPointerLock();
+            }
+        });
+
+        // --- INICIALIZACIÓN ---
+        createPlayer();
+        generateCity();
+        spawnVehicles();
+        spawnNPCs();
+
+        // Posicionar jugador en punto inicial
+        Player.position.set(0, 2, 0);
+        Player.mesh.position.copy(Player.position);
+
+        gameLoop();
+
+        // --- AJUSTAR VENTANA ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
+

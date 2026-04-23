@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enunciado · Práctica MVC · ADSO PHP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        :root { --mvc:#16a085; --model:#2980b9; --view:#8e44ad; --ctrl:#c0392b; }
+        body { font-family:'Segoe UI',sans-serif; background:#f0f4f3; }
+
+        .hero { background:linear-gradient(135deg,#0d1b2a 0%,#16a085 100%); color:#fff; padding:60px 0 50px; text-align:center; }
+        .hero .ficha { background:rgba(255,255,255,.12); border-radius:12px; padding:10px 22px; display:inline-flex; gap:28px; flex-wrap:wrap; justify-content:center; }
+        .hero .ficha span { font-size:.9rem; }
+
+        .card-panel { background:#fff; border-radius:16px; box-shadow:0 6px 24px rgba(0,0,0,.07); padding:36px 40px; margin-bottom:28px; }
+        @media(max-width:575px){ .card-panel{ padding:22px 18px; } }
+
+        .sec-title { border-left:5px solid var(--mvc); padding-left:14px; font-weight:700; margin-bottom:1.2rem; }
+
+        .tree { background:#1e1e2e; color:#cdd6f4; border-radius:12px; padding:20px 24px; font-family:'Fira Code','Courier New',monospace; font-size:.87rem; line-height:2; }
+        .tree .dir { color:#89b4fa; } .tree .file { color:#a6e3a1; } .tree .note { color:#585b70; font-style:italic; }
+
+        .layer-strip { border-radius:12px; padding:20px 24px; }
+        .ls-m { background:#eaf4fb; border-left:5px solid var(--model); }
+        .ls-v { background:#f5eef8; border-left:5px solid var(--view); }
+        .ls-c { background:#fdf2f2; border-left:5px solid var(--ctrl); }
+
+        .task-list { list-style:none; padding:0; margin:0; }
+        .task-list li { display:flex; gap:14px; align-items:flex-start; padding:13px 0; border-bottom:1px solid #f0f0f0; }
+        .task-list li:last-child { border-bottom:none; }
+        .task-num { width:30px; height:30px; border-radius:50%; background:var(--mvc); color:#fff; font-weight:700; font-size:.85rem; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+        .task-body strong { display:block; }
+        .task-body span { font-size:.85rem; color:#555; }
+
+        .tip { border-left:5px solid var(--mvc); background:#eafaf6; padding:13px 17px; border-radius:0 8px 8px 0; }
+        .warn { border-left:5px solid var(--ctrl); background:#fff5f5; padding:13px 17px; border-radius:0 8px 8px 0; }
+
+        .entrega-item { display:flex; gap:12px; align-items:center; padding:10px 14px; border-radius:8px; background:#f8f9fa; border:1px solid #e9ecef; font-size:.9rem; margin-bottom:8px; }
+        .entrega-item i { color:var(--mvc); }
+
+        /* mockup app */
+        .mockup { border:2px solid #dee2e6; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.1); }
+        .mockup-bar { background:#343a40; padding:8px 14px; display:flex; align-items:center; gap:8px; }
+        .mockup-bar .dot { width:12px; height:12px; border-radius:50%; }
+        .mockup-bar .url { background:#495057; color:#adb5bd; border-radius:6px; padding:3px 12px; font-size:.75rem; flex:1; font-family:monospace; }
+        .m-nav { background:#212529; color:#fff; padding:10px 18px; display:flex; justify-content:space-between; align-items:center; font-size:.85rem; }
+        .m-nav .brand { font-weight:700; }
+        .m-content { padding:18px; background:#f8f9fa; }
+        .m-card { background:#fff; border-radius:8px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,.08); margin-bottom:10px; }
+        .m-badge { font-size:.65rem; padding:2px 8px; border-radius:10px; color:#fff; display:inline-block; margin-bottom:6px; }
+        .m-title { font-weight:700; font-size:.9rem; margin:0 0 4px; }
+        .m-text  { font-size:.75rem; color:#6c757d; margin:0; }
+        .m-footer-bar { background:#212529; color:#aaa; text-align:center; font-size:.72rem; padding:8px; }
+
+        .cta-wrap { display:flex; gap:14px; flex-wrap:wrap; justify-content:center; margin-top:30px; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="../index.html">ADSO <span class="text-info">PHP</span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="teoria.html">Teoría</a></li>
+                <li class="nav-item"><a class="nav-link" href="demo/index.php">Demo</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Enunciado</a></li>
+                <li class="nav-item"><a class="nav-link" href="practica.html">Práctica</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<header class="hero">
+    <div class="container">
+        <p class="mb-2 opacity-75" style="letter-spacing:2px;font-size:.78rem;text-transform:uppercase">Práctica Formativa · MVC en PHP</p>
+        <h1 class="display-4 fw-bold mb-2">Tienda de Libros</h1>
+        <p class="lead mb-4">Construye una aplicación PHP usando el patrón <strong>Model · View · Controller</strong></p>
+        <div class="ficha">
+            <span><i class="fas fa-clock me-1"></i>60 – 90 min</span>
+            <span><i class="fas fa-user me-1"></i>Individual</span>
+            <span><i class="fas fa-server me-1"></i>PHP 8+</span>
+            <span><i class="fas fa-star me-1 text-warning"></i>100 puntos</span>
+        </div>
+    </div>
+</header>
+
+<div class="container py-5">
+
+    <!-- QUÉ CONSTRUIR -->
+    <div class="card-panel">
+        <h2 class="sec-title"><i class="fas fa-bullseye me-2"></i>¿Qué vas a construir?</h2>
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <p class="lead">Una <strong>Tienda de Libros</strong> con dos páginas PHP organizadas bajo el patrón MVC.</p>
+                <p>El reto <strong>no</strong> es que quede perfectamente estilizada, sino que
+                el código esté <em>correctamente repartido</em> entre Model, View y Controller,
+                siguiendo las reglas del patrón.</p>
+                <div class="row g-2 mt-2">
+                    <div class="col-6">
+                        <div class="p-3 rounded border text-center">
+                            <i class="fas fa-list fa-2x text-primary mb-2"></i><br>
+                            <strong>Catálogo</strong><br>
+                            <span class="small text-muted">Lista todos los libros con filtro por género</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-3 rounded border text-center">
+                            <i class="fas fa-book-open fa-2x text-success mb-2"></i><br>
+                            <strong>Detalle</strong><br>
+                            <span class="small text-muted">Muestra info completa de un libro</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <p class="small text-muted text-center mb-2">Así se verá el catálogo cuando esté terminado:</p>
+                <div class="mockup">
+                    <div class="mockup-bar">
+                        <div class="dot" style="background:#ff5f57"></div>
+                        <div class="dot" style="background:#febc2e"></div>
+                        <div class="dot" style="background:#28c840"></div>
+                        <div class="url">localhost:8000/practica_app/index.php?c=libro&a=index</div>
+                    </div>
+                    <div class="m-nav">
+                        <span class="brand">📚 LibroStore</span>
+                        <span style="border:1px solid rgba(255,255,255,.4);padding:2px 10px;border-radius:4px;font-size:.75rem">Catálogo</span>
+                    </div>
+                    <div class="m-content">
+                        <div class="d-flex gap-2 mb-3">
+                            <span style="background:#343a40;color:#fff;padding:3px 10px;border-radius:20px;font-size:.72rem">Todos</span>
+                            <span style="border:1px solid #16a085;color:#16a085;padding:3px 10px;border-radius:20px;font-size:.72rem">Novela</span>
+                            <span style="border:1px solid #16a085;color:#16a085;padding:3px 10px;border-radius:20px;font-size:.72rem">Ciencia</span>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <div class="m-card">
+                                    <span class="m-badge" style="background:#16a085">Novela</span>
+                                    <p class="m-title">Cien años de soledad</p>
+                                    <p class="m-text">Gabriel García Márquez</p>
+                                    <div class="mt-2" style="display:flex;justify-content:space-between;align-items:center">
+                                        <span style="font-size:.7rem;color:#aaa">$ 45.000</span>
+                                        <span style="background:#16a085;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:4px">Ver →</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="m-card">
+                                    <span class="m-badge" style="background:#2980b9">Ciencia</span>
+                                    <p class="m-title">Cosmos</p>
+                                    <p class="m-text">Carl Sagan</p>
+                                    <div class="mt-2" style="display:flex;justify-content:space-between;align-items:center">
+                                        <span style="font-size:.7rem;color:#aaa">$ 52.000</span>
+                                        <span style="background:#2980b9;color:#fff;font-size:.7rem;padding:2px 8px;border-radius:4px">Ver →</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-footer-bar">LibroStore · ADSO PHP MVC 2026</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ESTRUCTURA -->
+    <div class="card-panel">
+        <h2 class="sec-title"><i class="fas fa-folder-open me-2"></i>Estructura que debes crear</h2>
+        <div class="row g-4">
+            <div class="col-md-5">
+                <div class="tree">
+<span class="dir">practica_app/</span>
+├── <span class="file">index.php</span>         <span class="note">← Front Controller</span>
+│
+├── <span class="dir">core/</span>
+│   ├── <span class="file">Router.php</span>    <span class="note">← Lee URL, despacha</span>
+│   └── <span class="file">View.php</span>      <span class="note">← Carga vistas</span>
+│
+├── <span class="dir">controllers/</span>
+│   ├── <span class="file">HomeController.php</span>
+│   └── <span class="file">LibroController.php</span>
+│
+├── <span class="dir">models/</span>
+│   └── <span class="file">Libro.php</span>
+│
+└── <span class="dir">views/</span>
+    ├── <span class="dir">layout/</span>
+    │   ├── <span class="file">header.php</span>
+    │   └── <span class="file">footer.php</span>
+    ├── <span class="dir">home/</span>
+    │   └── <span class="file">index.php</span>
+    └── <span class="dir">libros/</span>
+        ├── <span class="file">lista.php</span>
+        └── <span class="file">show.php</span></div>
+            </div>
+            <div class="col-md-7">
+                <div class="layer-strip ls-c mb-3">
+                    <strong style="color:var(--ctrl)"><i class="fas fa-sitemap me-2"></i>Controllers</strong>
+                    <p class="small mb-0 mt-1">Reciben la petición, llaman al Model y pasan los datos a la View. <strong>Cero HTML, cero SQL.</strong></p>
+                </div>
+                <div class="layer-strip ls-m mb-3">
+                    <strong style="color:var(--model)"><i class="fas fa-database me-2"></i>Model — Libro.php</strong>
+                    <p class="small mb-0 mt-1">Métodos: <code>todos()</code>, <code>buscar($id)</code>, <code>porGenero($g)</code>, <code>generos()</code>. <strong>Cero HTML.</strong></p>
+                </div>
+                <div class="layer-strip ls-v">
+                    <strong style="color:var(--view)"><i class="fas fa-code me-2"></i>Views</strong>
+                    <p class="small mb-0 mt-1">Solo HTML + variables que vienen del Controller. <strong>Cero SQL, cero lógica de negocio.</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="card-panel">
+        <h2 class="sec-title"><i class="fas fa-tasks me-2"></i>Las 8 tareas</h2>
+        <ul class="task-list">
+            <li>
+                <div class="task-num">1</div>
+                <div class="task-body">
+                    <strong>core/Router.php</strong>
+                    <span>Lee <code>$_GET['c']</code> y <code>$_GET['a']</code>, carga el controller correcto y llama al método.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">2</div>
+                <div class="task-body">
+                    <strong>core/View.php</strong>
+                    <span>Método estático <code>render($vista, $datos)</code>: hace <code>extract($datos)</code> y carga header + vista + footer.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">3</div>
+                <div class="task-body">
+                    <strong>models/Libro.php</strong>
+                    <span>Array estático con al menos 5 libros. Implementa <code>todos()</code>, <code>buscar($id)</code>, <code>porGenero($g)</code> y <code>generos()</code>.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">4</div>
+                <div class="task-body">
+                    <strong>controllers/HomeController.php</strong>
+                    <span>Acción <code>index()</code>: renderiza <code>home/index</code>. Acción <code>notFound()</code>: respuesta 404.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">5</div>
+                <div class="task-body">
+                    <strong>controllers/LibroController.php</strong>
+                    <span>Acción <code>index()</code>: todos los libros → vista <code>libros/lista</code>. Acción <code>show()</code>: un libro por id → vista <code>libros/show</code>. Acción <code>genero()</code>: libros filtrados.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">6</div>
+                <div class="task-body">
+                    <strong>views/layout/header.php y footer.php</strong>
+                    <span>Layout compartido. El header usa <code>$titulo</code>. El footer incluye un enlace de regreso al catálogo.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">7</div>
+                <div class="task-body">
+                    <strong>views/libros/lista.php</strong>
+                    <span>Muestra los libros en tarjetas con filtros por género. Los enlaces apuntan a <code>?c=libro&a=show&id=X</code>.</span>
+                </div>
+            </li>
+            <li>
+                <div class="task-num">8</div>
+                <div class="task-body">
+                    <strong>views/libros/show.php</strong>
+                    <span>Muestra todos los datos del libro: título, autor, año, precio, descripción. Botón para volver al catálogo.</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- VERIFICACIÓN -->
+    <div class="card-panel">
+        <h2 class="sec-title"><i class="fas fa-terminal me-2"></i>Cómo probar</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <h6 class="fw-bold">Arrancar el servidor</h6>
+                <div style="background:#1e1e2e;color:#a6e3a1;padding:14px 18px;border-radius:10px;font-family:monospace;font-size:.85rem">
+                    cd practica_app<br>
+                    php -S localhost:8080
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h6 class="fw-bold">URLs a verificar</h6>
+                <ul class="list-group small">
+                    <li class="list-group-item"><i class="fas fa-check text-success me-2"></i><code>localhost:8080/index.php</code> — Página de inicio</li>
+                    <li class="list-group-item"><i class="fas fa-check text-success me-2"></i><code>?c=libro&amp;a=index</code> — Lista todos los libros</li>
+                    <li class="list-group-item"><i class="fas fa-check text-success me-2"></i><code>?c=libro&amp;a=show&amp;id=1</code> — Detalle del libro 1</li>
+                    <li class="list-group-item"><i class="fas fa-check text-success me-2"></i><code>?c=libro&amp;a=genero&amp;g=Novela</code> — Filtro por género</li>
+                    <li class="list-group-item"><i class="fas fa-check text-success me-2"></i><code>?c=libro&amp;a=show&amp;id=999</code> — Debe redirigir a 404</li>
+                </ul>
+            </div>
+        </div>
+        <div class="warn mt-4">
+            <strong><i class="fas fa-exclamation-triangle me-2"></i>El indicador de capa</strong> — La demo tiene una cajita en la esquina inferior derecha que muestra qué Controller, Model y View se están usando. Incluye algo similar en tu app para demostrar que comprendes el flujo.
+        </div>
+    </div>
+
+    <!-- ENTREGABLES -->
+    <div class="card-panel">
+        <h2 class="sec-title"><i class="fas fa-clipboard-check me-2"></i>Entregables y puntos</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="entrega-item"><i class="fas fa-folder-open"></i>Carpeta <code>practica_app/</code> completa con todos los archivos</div>
+                <div class="entrega-item"><i class="fas fa-camera"></i>Captura del catálogo con al menos 2 géneros filtrados</div>
+                <div class="entrega-item"><i class="fas fa-camera"></i>Captura del detalle de un libro</div>
+                <div class="entrega-item"><i class="fas fa-camera"></i>Captura de la redirección al 404 con id inválido</div>
+            </div>
+            <div class="col-md-6">
+                <table class="table table-bordered table-sm">
+                    <thead class="table-dark"><tr><th>Componente</th><th class="text-center">Pts</th></tr></thead>
+                    <tbody>
+                        <tr><td>Router y View.php correctos</td><td class="text-center">20</td></tr>
+                        <tr><td>Model con 4 métodos funcionales</td><td class="text-center">20</td></tr>
+                        <tr><td>Controllers sin HTML ni SQL</td><td class="text-center">20</td></tr>
+                        <tr><td>Views sin consultas ni lógica de negocio</td><td class="text-center">20</td></tr>
+                        <tr><td>Redirección 404 y filtro por género</td><td class="text-center">10</td></tr>
+                        <tr><td>Indicador MVC en la interfaz</td><td class="text-center">10</td></tr>
+                        <tr class="table-success fw-bold"><td>Total</td><td class="text-center">100</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-wrap">
+        <a href="teoria.html"      class="btn btn-outline-success btn-lg px-4 shadow-sm"><i class="fas fa-book me-2"></i>Repasar teoría</a>
+        <a href="demo/index.php"   class="btn btn-outline-primary btn-lg px-4 shadow-sm"><i class="fas fa-play me-2"></i>Ver demo</a>
+        <a href="practica.html"    class="btn btn-lg px-5 shadow fw-bold text-white" style="background:var(--mvc)"><i class="fas fa-pencil-alt me-2"></i>Ir a la práctica →</a>
+    </div>
+</div>
+
+<footer class="bg-dark text-white py-4 mt-2">
+    <div class="container text-center"><p class="mb-0">ADSO - Formación Profesional en PHP &copy; 2026</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

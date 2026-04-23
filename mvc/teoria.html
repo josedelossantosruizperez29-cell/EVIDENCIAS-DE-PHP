@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teoría MVC · ADSO PHP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        :root {
+            --mvc:   #16a085;
+            --model: #2980b9;
+            --view:  #8e44ad;
+            --ctrl:  #c0392b;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; color: #333; line-height: 1.7; }
+
+        /* sidebar */
+        .sidebar { background: #f0faf7; border-right: 1px solid #d5ece7; height: 100vh; overflow-y: auto; }
+        .sidebar .nav-link { color: #444; font-size: .84rem; padding: 5px 8px; border-radius: 6px; }
+        .sidebar .nav-link:hover { background: #d5ece7; color: var(--mvc); }
+        .sidebar .nav-link.active { background: var(--mvc); color: #fff; }
+
+        /* sección */
+        .section-title {
+            border-left: 5px solid var(--mvc);
+            padding-left: 14px;
+            margin-top: 3rem;
+            margin-bottom: 1.4rem;
+            font-weight: 700;
+        }
+
+        /* bloques de código */
+        .code-header {
+            background: #272822; color: #f8f8f2;
+            padding: 5px 15px; border-radius: 5px 5px 0 0;
+            font-size: .78rem; font-family: monospace;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        pre { margin-top: 0; border-radius: 0 0 8px 8px !important; font-size: .85rem; }
+
+        /* cajas */
+        .pro-tip  { border-left: 5px solid var(--mvc);   background: #eafaf6; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+        .warn-box { border-left: 5px solid var(--ctrl);  background: #fff5f5; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+        .info-box { border-left: 5px solid var(--model); background: #eaf4fb; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 16px 0; }
+
+        /* analogía del restaurante */
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        .rest-card {
+            border-radius: 14px;
+            padding: 24px 18px;
+            text-align: center;
+        }
+        .rest-emoji { font-size: 2.8rem; margin-bottom: 10px; }
+        .rest-role  { font-size: .7rem; text-transform: uppercase; letter-spacing: 2px; opacity: .7; margin-bottom: 4px; }
+        .rest-name  { font-weight: 700; font-size: 1.05rem; margin-bottom: 6px; }
+        .rest-desc  { font-size: .82rem; }
+        .rc-client  { background: #fdfaf0; border: 2px solid #f39c12; }
+        .rc-waiter  { background: #fdf2f2; border: 2px solid var(--ctrl); }
+        .rc-kitchen { background: #eaf4fb; border: 2px solid var(--model); }
+        .rc-plate   { background: #f5eef8; border: 2px solid var(--view); }
+
+        /* flecha entre las tarjetas */
+        .rest-arrow { display: flex; align-items: center; color: #aaa; font-size: 1.5rem; }
+
+        /* diagrama de flujo petición */
+        .flow-step {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,.07);
+            position: relative;
+        }
+        .flow-step .step-n {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--mvc); color: #fff;
+            font-size: .75rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .flow-step .fs-icon { font-size: 1.8rem; margin-bottom: 6px; }
+        .flow-step .fs-name { font-weight: 700; font-size: .9rem; margin-bottom: 2px; }
+        .flow-step .fs-desc { font-size: .75rem; color: #777; }
+        .flow-arrow-v { text-align: center; color: var(--mvc); font-size: 1.4rem; padding: 4px 0; }
+
+        /* antes vs después */
+        .spaghetti { background: #fff3f3; border: 2px dashed var(--ctrl); border-radius: 12px; padding: 20px; }
+        .clean-mvc  { background: #f0faf7; border: 2px solid var(--mvc);  border-radius: 12px; padding: 20px; }
+
+        /* capas MVC */
+        .layer-card {
+            border-radius: 14px;
+            padding: 28px 24px;
+            height: 100%;
+        }
+        .lc-m { background: #eaf4fb; border-top: 5px solid var(--model); }
+        .lc-v { background: #f5eef8; border-top: 5px solid var(--view); }
+        .lc-c { background: #fdf2f2; border-top: 5px solid var(--ctrl); }
+        .layer-card h5 { font-weight: 700; }
+        .layer-card ul  { font-size: .88rem; }
+
+        /* tabla comparativa */
+        .table-comparison thead { background: #2c3e50; color: #fff; }
+
+        /* frameworks */
+        .fw-pill {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: .82rem;
+            font-weight: 600;
+            margin: 4px;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="../index.html">ADSO <span class="text-info">PHP</span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="index.html">← MVC Hub</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Teoría</a></li>
+                <li class="nav-item"><a class="nav-link" href="demo/index.php">Demo</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+<div class="row">
+
+<!-- ── Sidebar ─────────────────────────────────── -->
+<div class="col-lg-2 d-none d-lg-block sidebar p-4 sticky-top">
+    <p class="text-uppercase fw-bold text-muted small mb-2">Teoría MVC</p>
+    <nav class="nav flex-column">
+        <a class="nav-link" href="#patron">¿Qué es un patrón?</a>
+        <a class="nav-link" href="#historia">Historia y origen</a>
+        <a class="nav-link" href="#restaurante">Analogía</a>
+        <a class="nav-link" href="#componentes">Los 3 componentes</a>
+        <a class="nav-link" href="#flujo">Flujo de petición</a>
+        <a class="nav-link" href="#espagueti">Antes vs Después</a>
+        <a class="nav-link" href="#estructura">Estructura</a>
+        <a class="nav-link" href="#codigo">Código completo</a>
+        <a class="nav-link" href="#reglas">Reglas de oro</a>
+        <a class="nav-link" href="#frameworks">Frameworks</a>
+    </nav>
+</div>
+
+<!-- ── Contenido ───────────────────────────────── -->
+<div class="col-lg-10 p-4 p-lg-5">
+    <h1 class="display-4 fw-bold">El Patrón MVC</h1>
+    <p class="lead text-muted">
+        La arquitectura que separa <span style="color:var(--model)">datos</span>,
+        <span style="color:var(--view)">presentación</span> y
+        <span style="color:var(--ctrl)">lógica</span>
+        para que tu código sea mantenible, escalable y profesional.
+    </p>
+    <hr>
+
+    <!-- ═══ ¿QUÉ ES UN PATRÓN? ═══ -->
+    <section id="patron">
+        <h2 class="section-title">¿Qué es un patrón de diseño?</h2>
+        <p>
+            Un <strong>patrón de diseño</strong> es una solución probada y reutilizable a un problema
+            recurrente en el desarrollo de software. No es código que copias: es una
+            <em>receta de estructura</em> que guía cómo organizar tus clases, archivos y responsabilidades.
+        </p>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="p-3 rounded border text-center h-100">
+                    <i class="fas fa-recycle fa-2x mb-2" style="color:var(--mvc)"></i>
+                    <h6>Reutilizable</h6>
+                    <p class="small text-muted">El mismo patrón funciona en proyectos pequeños y grandes, en PHP, Java, Python…</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded border text-center h-100">
+                    <i class="fas fa-comments fa-2x mb-2" style="color:var(--model)"></i>
+                    <h6>Lenguaje común</h6>
+                    <p class="small text-muted">Cuando dices "es MVC", cualquier desarrollador entiende la estructura sin ver el código.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 rounded border text-center h-100">
+                    <i class="fas fa-shield-alt fa-2x mb-2" style="color:var(--ctrl)"></i>
+                    <h6>Probado en batalla</h6>
+                    <p class="small text-muted">No estás inventando algo nuevo — estás usando lo que miles de equipos ya validaron.</p>
+                </div>
+            </div>
+        </div>
+        <div class="info-box mt-3">
+            <strong>MVC</strong> (Model-View-Controller) es el patrón de diseño de arquitectura
+            más utilizado en desarrollo web. Laravel, Symfony, Ruby on Rails, Django, ASP.NET…
+            todos lo implementan.
+        </div>
+    </section>
+
+    <!-- ═══ HISTORIA ═══ -->
+    <section id="historia">
+        <h2 class="section-title">Historia y origen</h2>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="p-3 bg-white rounded shadow-sm h-100">
+                    <div class="d-flex gap-3 align-items-start">
+                        <span class="badge bg-dark px-3 py-2 fs-6">1979</span>
+                        <div>
+                            <strong
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-trigger="hover focus"
+                                data-bs-placement="top"
+                                data-bs-title="Trygve Reenskaug"
+                                data-bs-content="Ingeniero de software noruego (n. 1930). Trabajó en Xerox PARC en los años 70, donde desarrolló el patrón MVC mientras investigaba cómo construir interfaces de usuario mantenibles. Su paper original se llamó &quot;Models-Views-Controllers&quot; (1979)."
+                                style="cursor:help;border-bottom:2px dotted var(--mvc)"
+                            >Trygve Reenskaug</strong>
+
+                            (<span
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-trigger="hover focus"
+                                data-bs-placement="top"
+                                data-bs-title="Xerox PARC"
+                                data-bs-content="Palo Alto Research Center — laboratorio de investigación de Xerox en California. Cuna de innovaciones como la interfaz gráfica de usuario (GUI), el mouse, Ethernet y la programación orientada a objetos. Apple y Microsoft tomaron muchas de sus ideas para crear sus sistemas operativos."
+                                style="cursor:help;border-bottom:2px dotted #e67e22"
+                            >Xerox PARC</span>) propone MVC
+                            para el lenguaje <span
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-trigger="hover focus"
+                                data-bs-placement="top"
+                                data-bs-title="Smalltalk-80"
+                                data-bs-content="Uno de los primeros lenguajes de programación orientado a objetos, desarrollado en Xerox PARC. Fue el entorno donde nació MVC. Influyó directamente en Java, Python, Ruby y prácticamente todos los lenguajes OOP modernos."
+                                style="cursor:help;border-bottom:2px dotted var(--model)"
+                            >Smalltalk-80</span>. El objetivo: separar la interfaz
+                            de usuario de la lógica de negocio.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 bg-white rounded shadow-sm h-100">
+                    <div class="d-flex gap-3 align-items-start">
+                        <span class="badge px-3 py-2 fs-6" style="background:var(--mvc)">2005+</span>
+                        <div>
+                            Con el auge del desarrollo web (Ruby on Rails, Django, CodeIgniter),
+                            MVC se convierte en el estándar de facto para aplicaciones web.
+                            Laravel (PHP) lo populariza definitivamente en 2011.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ANALOGÍA RESTAURANTE ═══ -->
+    <section id="restaurante">
+        <h2 class="section-title">La analogía del restaurante</h2>
+        <p>
+            La forma más sencilla de entender MVC es imaginarlo como un restaurante.
+            Cada rol tiene una responsabilidad específica y <strong>no se mete en el trabajo del otro</strong>.
+        </p>
+
+        <div class="restaurant-grid align-items-center my-4">
+            <div class="rest-card rc-client">
+                <div class="rest-emoji">🙋</div>
+                <div class="rest-role">El mundo real</div>
+                <div class="rest-name">Cliente</div>
+                <div class="rest-desc">Hace una petición: "quiero ver la carta de pizzas"</div>
+                <div class="mt-2"><span class="badge bg-warning text-dark">Navegador / Usuario</span></div>
+            </div>
+            <div class="rest-arrow justify-content-center d-flex">→</div>
+            <div class="rest-card rc-waiter">
+                <div class="rest-emoji">🤵</div>
+                <div class="rest-role">Controller</div>
+                <div class="rest-name">Mesero</div>
+                <div class="rest-desc">Toma el pedido, va a la cocina, trae el plato. <strong>Coordina.</strong></div>
+                <div class="mt-2"><span class="badge" style="background:var(--ctrl)">Controller</span></div>
+            </div>
+            <div class="rest-arrow justify-content-center d-flex">⇄</div>
+            <div class="rest-card rc-kitchen">
+                <div class="rest-emoji">👨‍🍳</div>
+                <div class="rest-role">Model</div>
+                <div class="rest-name">Cocina</div>
+                <div class="rest-desc">Prepara la comida con los ingredientes (base de datos). <strong>Lógica + datos.</strong></div>
+                <div class="mt-2"><span class="badge" style="background:var(--model)">Model</span></div>
+            </div>
+            <div class="rest-arrow justify-content-center d-flex">→</div>
+            <div class="rest-card rc-plate">
+                <div class="rest-emoji">🍽</div>
+                <div class="rest-role">View</div>
+                <div class="rest-name">El plato</div>
+                <div class="rest-desc">La presentación final para el cliente. <strong>Solo muestra,</strong> no cocina.</div>
+                <div class="mt-2"><span class="badge" style="background:var(--view)">View</span></div>
+            </div>
+        </div>
+
+        <div class="pro-tip">
+            <strong>Regla clave:</strong> El cliente <em>nunca</em> entra a la cocina,
+            y la cocina <em>nunca</em> sale a atender. Cada rol conoce solo lo suyo.
+            Así mismo, en MVC: la vista nunca consulta la base de datos, y el modelo nunca genera HTML.
+        </div>
+    </section>
+
+    <!-- ═══ LOS 3 COMPONENTES ═══ -->
+    <section id="componentes">
+        <h2 class="section-title">Los 3 componentes en detalle</h2>
+
+        <div class="row g-4">
+            <!-- MODEL -->
+            <div class="col-md-4">
+                <div class="layer-card lc-m">
+                    <h5 style="color:var(--model)"><i class="fas fa-database me-2"></i>Model</h5>
+                    <p class="small">El <strong>corazón lógico</strong> de la aplicación. Gestiona los datos y las reglas de negocio.</p>
+                    <ul class="small">
+                        <li>Consulta y escribe en la base de datos</li>
+                        <li>Valida datos</li>
+                        <li>Aplica reglas de negocio</li>
+                        <li><strong>No sabe nada</strong> de HTML ni de HTTP</li>
+                    </ul>
+                    <div class="mt-3 p-2 rounded" style="background:rgba(41,128,185,.1);font-size:.8rem">
+                        <strong>Ejemplos:</strong><br>
+                        <code>Producto.php</code>, <code>Usuario.php</code>, <code>Pedido.php</code>
+                    </div>
+                </div>
+            </div>
+            <!-- VIEW -->
+            <div class="col-md-4">
+                <div class="layer-card lc-v">
+                    <h5 style="color:var(--view)"><i class="fas fa-eye me-2"></i>View</h5>
+                    <p class="small">La <strong>interfaz de usuario</strong>. Solo muestra datos, nunca los procesa.</p>
+                    <ul class="small">
+                        <li>Genera HTML para el navegador</li>
+                        <li>Usa variables que le pasa el Controller</li>
+                        <li>Puede tener lógica mínima (<code>foreach</code>, <code>if</code>)</li>
+                        <li><strong>Nunca</strong> consulta la BD directamente</li>
+                    </ul>
+                    <div class="mt-3 p-2 rounded" style="background:rgba(142,68,173,.1);font-size:.8rem">
+                        <strong>Ejemplos:</strong><br>
+                        <code>lista.php</code>, <code>detalle.php</code>, <code>formulario.php</code>
+                    </div>
+                </div>
+            </div>
+            <!-- CONTROLLER -->
+            <div class="col-md-4">
+                <div class="layer-card lc-c">
+                    <h5 style="color:var(--ctrl)"><i class="fas fa-sitemap me-2"></i>Controller</h5>
+                    <p class="small">El <strong>director de orquesta</strong>. Recibe la petición y coordina M y V.</p>
+                    <ul class="small">
+                        <li>Recibe la petición HTTP (<code>$_GET</code>, <code>$_POST</code>)</li>
+                        <li>Llama al Model para obtener/guardar datos</li>
+                        <li>Pasa los datos a la View</li>
+                        <li><strong>No genera HTML</strong> ni consulta BD directamente</li>
+                    </ul>
+                    <div class="mt-3 p-2 rounded" style="background:rgba(192,57,43,.1);font-size:.8rem">
+                        <strong>Ejemplos:</strong><br>
+                        <code>ProductoController.php</code>, <code>AuthController.php</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FLUJO DE PETICIÓN ═══ -->
+    <section id="flujo">
+        <h2 class="section-title">Flujo de una petición HTTP</h2>
+        <p>
+            Esto es lo que ocurre exactamente cada vez que un usuario entra a
+            <code>tuapp.com/productos</code>:
+        </p>
+
+        <div class="row g-0 align-items-center my-4">
+            <div class="col"><div class="flow-step"><div class="step-n">1</div><div class="fs-icon">🌐</div><div class="fs-name">Navegador</div><div class="fs-desc">GET /productos</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">→</div></div>
+            <div class="col"><div class="flow-step"><div class="step-n">2</div><div class="fs-icon">🚦</div><div class="fs-name">Router</div><div class="fs-desc">¿Qué controller?</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">→</div></div>
+            <div class="col"><div class="flow-step" style="border-top:4px solid var(--ctrl)"><div class="step-n" style="background:var(--ctrl)">3</div><div class="fs-icon">🤵</div><div class="fs-name">Controller</div><div class="fs-desc">index()</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">→</div></div>
+            <div class="col"><div class="flow-step" style="border-top:4px solid var(--model)"><div class="step-n" style="background:var(--model)">4</div><div class="fs-icon">👨‍🍳</div><div class="fs-name">Model</div><div class="fs-desc">all()</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">←</div></div>
+            <div class="col"><div class="flow-step"><div class="step-n">5</div><div class="fs-icon">🗄</div><div class="fs-name">Base de datos</div><div class="fs-desc">SELECT *</div></div></div>
+        </div>
+        <div class="row g-0 align-items-center">
+            <div class="col"><div class="flow-step" style="border-top:4px solid var(--ctrl)"><div class="step-n" style="background:var(--ctrl)">6</div><div class="fs-icon">🤵</div><div class="fs-name">Controller</div><div class="fs-desc">$data = productos</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">→</div></div>
+            <div class="col"><div class="flow-step" style="border-top:4px solid var(--view)"><div class="step-n" style="background:var(--view)">7</div><div class="fs-icon">🍽</div><div class="fs-name">View</div><div class="fs-desc">render(data)</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">→</div></div>
+            <div class="col"><div class="flow-step"><div class="step-n">8</div><div class="fs-icon">📄</div><div class="fs-name">HTML</div><div class="fs-desc">Respuesta final</div></div></div>
+            <div class="col-auto px-1"><div class="flow-arrow-v">→</div></div>
+            <div class="col"><div class="flow-step"><div class="step-n">9</div><div class="fs-icon">🙋</div><div class="fs-name">Navegador</div><div class="fs-desc">Renderiza página</div></div></div>
+        </div>
+
+        <div class="pro-tip mt-4">
+            <strong>Flujo resumido:</strong>
+            Petición → Router → Controller → Model → BD → Controller → View → Respuesta HTML
+        </div>
+    </section>
+
+    <!-- ═══ ANTES vs DESPUÉS ═══ -->
+    <section id="espagueti">
+        <h2 class="section-title">Antes de MVC: el "código espagueti"</h2>
+        <p>
+            Sin MVC, un archivo PHP típico mezcla todo en el mismo lugar: consultas SQL,
+            lógica de negocio y HTML. Esto se llama <strong>código espagueti</strong>
+            porque, como los fideos, todo está enredado con todo.
+        </p>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="spaghetti">
+                    <h6 class="text-danger mb-3"><i class="fas fa-times-circle me-2"></i>Sin MVC — Todo mezclado</h6>
+                    <div class="code-header"><span>productos.php (antes)</span></div>
+                    <pre class="bg-dark text-light p-3" style="font-size:.78rem">&lt;?php
+// SQL directo aquí
+$pdo = new PDO('mysql:host=localhost;dbname=tienda', 'root', '');
+$stmt = $pdo-&gt;query('SELECT * FROM productos WHERE activo = 1');
+$productos = $stmt-&gt;fetchAll();
+
+// Lógica de negocio aquí
+$descuento = 0.1;
+foreach ($productos as &$p) {
+    $p['precio_final'] = $p['precio'] * (1 - $descuento);
+}
+?&gt;
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Productos&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Productos&lt;/h1&gt;
+&lt;?php foreach ($productos as $p): ?&gt;
+    &lt;div&gt;
+        &lt;?php
+        // Más lógica aquí dentro del HTML
+        $clase = $p['stock'] &gt; 0 ? 'disponible' : 'agotado';
+        ?&gt;
+        &lt;p class="&lt;?= $clase ?&gt;"&gt;
+            &lt;?= $p['nombre'] ?&gt; - $&lt;?= $p['precio_final'] ?&gt;
+        &lt;/p&gt;
+    &lt;/div&gt;
+&lt;?php endforeach; ?&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+                    <ul class="small text-danger mt-2 mb-0">
+                        <li>¿Quieres reutilizar la consulta? Copia y pega.</li>
+                        <li>¿Quieres cambiar el diseño? Buscas entre SQL y PHP.</li>
+                        <li>¿Quieres hacer pruebas? Imposible sin levantar una BD.</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="clean-mvc">
+                    <h6 class="mb-3" style="color:var(--mvc)"><i class="fas fa-check-circle me-2"></i>Con MVC — Cada cosa en su lugar</h6>
+                    <div class="code-header"><span>models/Producto.php</span></div>
+                    <pre class="bg-dark text-light p-3" style="font-size:.78rem">&lt;?php
+class Producto {
+    // Solo datos y reglas de negocio
+    public static function todos(): array {
+        $pdo = Database::conexion();
+        return $pdo-&gt;query('SELECT * FROM productos
+                            WHERE activo = 1')
+                   -&gt;fetchAll();
+    }
+    public static function precioConDescuento(array $p): float {
+        return $p['precio'] * 0.9;
+    }
+}</pre>
+                    <div class="code-header"><span>controllers/ProductoController.php</span></div>
+                    <pre class="bg-dark text-light p-3" style="font-size:.78rem">&lt;?php
+class ProductoController {
+    // Solo coordina M y V
+    public function index(): void {
+        $productos = Producto::todos();
+        View::render('productos/lista', compact('productos'));
+    }
+}</pre>
+                    <div class="code-header"><span>views/productos/lista.php</span></div>
+                    <pre class="bg-dark text-light p-3" style="font-size:.78rem">&lt;!-- Solo HTML + variables --&gt;
+&lt;h1&gt;Productos&lt;/h1&gt;
+&lt;?php foreach ($productos as $p): ?&gt;
+    &lt;p&gt;&lt;?= esc($p['nombre']) ?&gt;&lt;/p&gt;
+&lt;?php endforeach; ?&gt;</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-3">
+            <div class="col-md-6">
+                <table class="table table-bordered table-comparison">
+                    <thead><tr><th>Característica</th><th>Sin MVC</th><th>Con MVC</th></tr></thead>
+                    <tbody>
+                        <tr><td>Reutilización</td><td class="text-danger">Copy-paste</td><td class="text-success">Llamas al Model</td></tr>
+                        <tr><td>Cambiar diseño</td><td class="text-danger">Tocas todo</td><td class="text-success">Solo la View</td></tr>
+                        <tr><td>Cambiar BD</td><td class="text-danger">Tocas todo</td><td class="text-success">Solo el Model</td></tr>
+                        <tr><td>Trabajo en equipo</td><td class="text-danger">Conflictos</td><td class="text-success">Cada uno su capa</td></tr>
+                        <tr><td>Pruebas unitarias</td><td class="text-danger">Casi imposible</td><td class="text-success">Posible y sencillo</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-6 d-flex align-items-center">
+                <div class="warn-box w-100">
+                    <strong><i class="fas fa-exclamation-triangle me-2"></i>El precio del desorden:</strong>
+                    Un proyecto de 6 meses sin arquitectura suele volverse imposible de mantener.
+                    Agregar una funcionalidad nueva rompe tres que ya funcionaban.
+                    MVC evita exactamente eso.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ESTRUCTURA DE DIRECTORIOS ═══ -->
+    <section id="estructura">
+        <h2 class="section-title">Estructura de directorios estándar</h2>
+        <p>Así se organiza una aplicación PHP con MVC:</p>
+
+        <div class="row g-4">
+            <div class="col-md-5">
+                <div style="background:#1e1e2e;color:#cdd6f4;border-radius:12px;padding:22px;font-family:'Fira Code',monospace;font-size:.85rem;line-height:2">
+<span style="color:#89b4fa">mi-app/</span>
+├── <span style="color:#a6e3a1">index.php</span>          <span style="color:#585b70">← Front Controller</span>
+│
+├── <span style="color:#89b4fa">core/</span>
+│   ├── <span style="color:#a6e3a1">Router.php</span>     <span style="color:#585b70">← Enruta peticiones</span>
+│   └── <span style="color:#a6e3a1">View.php</span>       <span style="color:#585b70">← Carga vistas</span>
+│
+├── <span style="color:#cba6f7">controllers/</span>       <span style="color:#585b70">← C de MVC</span>
+│   ├── <span style="color:#a6e3a1">HomeController.php</span>
+│   └── <span style="color:#a6e3a1">ProductoController.php</span>
+│
+├── <span style="color:#f38ba8">models/</span>            <span style="color:#585b70">← M de MVC</span>
+│   └── <span style="color:#a6e3a1">Producto.php</span>
+│
+└── <span style="color:#fab387">views/</span>             <span style="color:#585b70">← V de MVC</span>
+    ├── <span style="color:#89b4fa">layout/</span>
+    │   ├── <span style="color:#a6e3a1">header.php</span>
+    │   └── <span style="color:#a6e3a1">footer.php</span>
+    └── <span style="color:#89b4fa">productos/</span>
+        ├── <span style="color:#a6e3a1">lista.php</span>
+        └── <span style="color:#a6e3a1">detalle.php</span>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="mb-3 p-3 rounded border">
+                    <h6><i class="fas fa-door-open me-2 text-success"></i>index.php — El Front Controller</h6>
+                    <p class="small mb-0">
+                        <strong>Único punto de entrada.</strong> Todas las peticiones pasan por aquí.
+                        Su único trabajo es cargar las clases del core e iniciar el Router.
+                        Equivale a la puerta principal del restaurante.
+                    </p>
+                </div>
+                <div class="mb-3 p-3 rounded border">
+                    <h6><i class="fas fa-traffic-light me-2" style="color:var(--mvc)"></i>core/Router.php</h6>
+                    <p class="small mb-0">
+                        Lee la URL, decide qué Controller y qué método llamar.
+                        Ejemplo: <code>?c=producto&amp;a=index</code> → crea
+                        <code>ProductoController</code> y llama a <code>index()</code>.
+                    </p>
+                </div>
+                <div class="mb-3 p-3 rounded border">
+                    <h6><i class="fas fa-eye me-2" style="color:var(--view)"></i>core/View.php</h6>
+                    <p class="small mb-0">
+                        Método estático <code>render($vista, $datos)</code> que carga el header,
+                        la vista solicitada con las variables extraídas de <code>$datos</code>,
+                        y el footer.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ CÓDIGO COMPLETO ═══ -->
+    <section id="codigo">
+        <h2 class="section-title">Código de cada capa explicado</h2>
+
+        <!-- Router -->
+        <h5 class="mt-4" style="color:var(--mvc)"><i class="fas fa-traffic-light me-2"></i>core/Router.php</h5>
+        <div class="code-header"><span>core/Router.php</span><i class="fas fa-code"></i></div>
+        <pre class="bg-dark text-light p-3">&lt;?php
+class Router
+{
+    public function despachar(): void
+    {
+        // Lee el controlador de la URL: ?c=producto  →  'producto'
+        $nombreCtrl = ucfirst($_GET['c'] ?? 'home') . 'Controller';
+        // Lee la acción: ?a=show  →  'show'
+        $accion     = $_GET['a'] ?? 'index';
+
+        $archivo = __DIR__ . '/../controllers/' . $nombreCtrl . '.php';
+
+        // Si el controller no existe, redirige al 404
+        if (!file_exists($archivo)) {
+            $nombreCtrl = 'HomeController';
+            $accion     = 'notFound';
+            $archivo    = __DIR__ . '/../controllers/' . $nombreCtrl . '.php';
+        }
+
+        require_once $archivo;
+
+        $controller = new $nombreCtrl();
+        $controller-&gt;$accion();   // llama al método correcto
+    }
+}</pre>
+
+        <!-- View helper -->
+        <h5 class="mt-4" style="color:var(--mvc)"><i class="fas fa-eye me-2"></i>core/View.php</h5>
+        <div class="code-header"><span>core/View.php</span><i class="fas fa-code"></i></div>
+        <pre class="bg-dark text-light p-3">&lt;?php
+class View
+{
+    /**
+     * Carga el layout completo (header + vista + footer).
+     *
+     * @param string $vista  Ruta relativa en views/  ej: 'productos/lista'
+     * @param array  $datos  Variables a exponer en la vista
+     */
+    public static function render(string $vista, array $datos = []): void
+    {
+        // extract() convierte ['key' => 'val'] en $key = 'val'
+        // así la vista puede usar $key directamente
+        extract($datos);
+
+        require_once __DIR__ . '/../views/layout/header.php';
+        require_once __DIR__ . '/../views/' . $vista . '.php';
+        require_once __DIR__ . '/../views/layout/footer.php';
+    }
+}</pre>
+
+        <!-- Model -->
+        <h5 class="mt-4" style="color:var(--model)"><i class="fas fa-database me-2"></i>models/Producto.php</h5>
+        <div class="code-header"><span>models/Producto.php</span><i class="fas fa-code"></i></div>
+        <pre class="bg-dark text-light p-3">&lt;?php
+class Producto
+{
+    // En este ejemplo los datos son estáticos (sin BD).
+    // En un proyecto real aquí irían las consultas PDO.
+
+    private static array $datos = [
+        ['id' =&gt; 1, 'nombre' =&gt; 'Laptop Pro', 'precio' =&gt; 2_500_000, 'categoria' =&gt; 'Tecnología'],
+        ['id' =&gt; 2, 'nombre' =&gt; 'Teclado RGB', 'precio' =&gt;   180_000, 'categoria' =&gt; 'Tecnología'],
+        ['id' =&gt; 3, 'nombre' =&gt; 'Silla Gamer', 'precio' =&gt;   850_000, 'categoria' =&gt; 'Mobiliario'],
+    ];
+
+    // Devuelve todos los productos
+    public static function todos(): array
+    {
+        return self::$datos;
+    }
+
+    // Busca uno por id; devuelve null si no existe
+    public static function buscar(int $id): ?array
+    {
+        foreach (self::$datos as $p) {
+            if ($p['id'] === $id) return $p;
+        }
+        return null;
+    }
+}</pre>
+
+        <!-- Controller -->
+        <h5 class="mt-4" style="color:var(--ctrl)"><i class="fas fa-sitemap me-2"></i>controllers/ProductoController.php</h5>
+        <div class="code-header"><span>controllers/ProductoController.php</span><i class="fas fa-code"></i></div>
+        <pre class="bg-dark text-light p-3">&lt;?php
+require_once __DIR__ . '/../models/Producto.php';
+
+class ProductoController
+{
+    // Acción: listar todos
+    public function index(): void
+    {
+        // 1. Pide datos al Model
+        $productos = Producto::todos();
+
+        // 2. Los pasa a la View (nada de HTML aquí)
+        View::render('productos/lista', compact('productos'));
+    }
+
+    // Acción: mostrar uno
+    public function show(): void
+    {
+        $id = (int) ($_GET['id'] ?? 0);
+        $producto = Producto::buscar($id);
+
+        if ($producto === null) {
+            header('Location: index.php?c=home&a=notFound');
+            exit;
+        }
+
+        View::render('productos/detalle', compact('producto'));
+    }
+}</pre>
+
+        <!-- View -->
+        <h5 class="mt-4" style="color:var(--view)"><i class="fas fa-code me-2"></i>views/productos/lista.php</h5>
+        <div class="code-header"><span>views/productos/lista.php</span><i class="fas fa-code"></i></div>
+        <pre class="bg-dark text-light p-3">&lt;!-- Solo HTML + variables que vienen del Controller.
+     NUNCA consultas SQL, NUNCA lógica de negocio aquí. --&gt;
+
+&lt;h1&gt;Catálogo de productos&lt;/h1&gt;
+
+&lt;div class="row"&gt;
+&lt;?php foreach ($productos as $p): ?&gt;
+    &lt;div class="col-md-4"&gt;
+        &lt;div class="card"&gt;
+            &lt;div class="card-body"&gt;
+                &lt;h5&gt;&lt;?= htmlspecialchars($p['nombre']) ?&gt;&lt;/h5&gt;
+                &lt;p&gt;$ &lt;?= number_format($p['precio'], 0, ',', '.') ?&gt;&lt;/p&gt;
+                &lt;a href="index.php?c=producto&amp;a=show&amp;id=&lt;?= $p['id'] ?&gt;"&gt;
+                    Ver detalle
+                &lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/div&gt;
+&lt;?php endforeach; ?&gt;
+&lt;/div&gt;</pre>
+
+        <div class="pro-tip mt-3">
+            <strong>Patrón clave:</strong> El Controller hace <code>View::render('productos/lista', compact('productos'))</code>.
+            La función <code>compact()</code> de PHP convierte la variable <code>$productos</code> en el array
+            <code>['productos' => $productos]</code>. Dentro de la view, <code>extract()</code> lo convierte
+            de vuelta en <code>$productos</code>. Así el Controller y la View se comunican sin acoplarse.
+        </div>
+    </section>
+
+    <!-- ═══ REGLAS DE ORO ═══ -->
+    <section id="reglas">
+        <h2 class="section-title">Reglas de oro del MVC</h2>
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="p-3 rounded h-100" style="background:#f0faf7;border-left:4px solid var(--mvc)">
+                    <strong>✅ El Model nunca genera HTML</strong>
+                    <p class="small mb-0 mt-1">Solo trabaja con datos y lógica. Si ves <code>echo "&lt;div&gt;"</code> en un Model, algo está mal.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 rounded h-100" style="background:#f0faf7;border-left:4px solid var(--mvc)">
+                    <strong>✅ La View nunca consulta la BD</strong>
+                    <p class="small mb-0 mt-1">Si ves <code>new PDO()</code> o <code>$pdo-&gt;query()</code> en una vista, algo está mal.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 rounded h-100" style="background:#f0faf7;border-left:4px solid var(--mvc)">
+                    <strong>✅ El Controller solo coordina</strong>
+                    <p class="small mb-0 mt-1">No genera HTML ni escribe SQL. Su trabajo es recibir, llamar al Model, y pasarle el resultado a la View.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 rounded h-100" style="background:#fff5f5;border-left:4px solid var(--ctrl)">
+                    <strong>❌ La View no toma decisiones de negocio</strong>
+                    <p class="small mb-0 mt-1">
+                        Cálculos como <code>$precio * 0.9</code> pertenecen al Model.
+                        La View solo formatea para mostrar.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FRAMEWORKS ═══ -->
+    <section id="frameworks">
+        <h2 class="section-title">Frameworks PHP que usan MVC</h2>
+        <p>
+            Una vez que domines MVC "a mano", el salto a un framework es mucho más fácil
+            porque todos siguen el mismo patrón:
+        </p>
+        <div class="mt-3">
+            <span class="fw-pill" style="background:#ff2d20;color:#fff">Laravel</span>
+            <span class="fw-pill" style="background:#000;color:#fff">Symfony</span>
+            <span class="fw-pill" style="background:#dd4814;color:#fff">CodeIgniter</span>
+            <span class="fw-pill" style="background:#0073aa;color:#fff">Yii2</span>
+            <span class="fw-pill" style="background:#4f5b93;color:#fff">Zend / Laminas</span>
+            <span class="fw-pill" style="background:#3498db;color:#fff">Phalcon</span>
+            <span class="fw-pill" style="background:#e74c3c;color:#fff">CakePHP</span>
+        </div>
+        <div class="info-box mt-3">
+            <strong>Laravel específicamente</strong> implementa MVC con convenciones claras:
+            los Models en <code>app/Models/</code>, los Controllers en <code>app/Http/Controllers/</code>
+            y las Views (llamadas <em>Blade templates</em>) en <code>resources/views/</code>.
+            Si entiendes MVC desde cero, Laravel se aprende en días.
+        </div>
+    </section>
+
+    <!-- Botones -->
+    <div class="d-flex gap-3 flex-wrap mt-5 mb-3">
+        <a href="demo/index.php" class="btn btn-success btn-lg px-4 shadow-sm">
+            <i class="fas fa-play me-2"></i>Ver demo funcional
+        </a>
+        <a href="enunciado.html" class="btn btn-outline-danger btn-lg px-4 shadow-sm">
+            <i class="fas fa-flag me-2"></i>Ir al enunciado
+        </a>
+        <a href="index.html" class="btn btn-outline-secondary btn-lg px-4 shadow-sm">
+            <i class="fas fa-home me-2"></i>Hub MVC
+        </a>
+    </div>
+
+</div><!-- /col-10 -->
+</div><!-- /row -->
+</div><!-- /container-fluid -->
+
+<footer class="bg-dark text-white py-4 mt-3">
+    <div class="container text-center">
+        <p class="mb-0">ADSO - Formación Profesional en PHP &copy; 2026</p>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Sidebar activo
+    const secs = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.sidebar .nav-link');
+    window.addEventListener('scroll', () => {
+        let cur = '';
+        secs.forEach(s => { if (window.scrollY >= s.offsetTop - 100) cur = s.id; });
+        links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    });
+
+    // Activar todos los popovers
+    document.querySelectorAll('[data-bs-toggle="popover"]').forEach(el => {
+        new bootstrap.Popover(el, { html: false });
+    });
+</script>
+</body>
+</html>

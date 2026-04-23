@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Práctica MVC · ADSO PHP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        :root { --mvc:#16a085; --model:#2980b9; --view:#8e44ad; --ctrl:#c0392b; }
+        body { font-family:'Segoe UI',sans-serif; background:#f0f4f3; color:#333; }
+
+        /* sidebar */
+        .sidebar { background:#f0faf7; border-right:1px solid #d5ece7; height:100vh; overflow-y:auto; }
+        .sidebar .nav-link { color:#444; font-size:.83rem; padding:5px 8px; border-radius:6px; }
+        .sidebar .nav-link:hover  { background:#d5ece7; color:var(--mvc); }
+        .sidebar .nav-link.active { background:var(--mvc); color:#fff; }
+        .sidebar .nav-link.sep { color:#aaa; font-size:.7rem; text-transform:uppercase; letter-spacing:1px; pointer-events:none; margin-top:10px; }
+
+        /* paso numerado */
+        .step-badge {
+            width:40px; height:40px; border-radius:50%;
+            background:var(--mvc); color:#fff;
+            font-weight:700; font-size:1rem;
+            display:flex; align-items:center; justify-content:center;
+            flex-shrink:0;
+        }
+        .step-badge.ctrl  { background:var(--ctrl); }
+        .step-badge.model { background:var(--model); }
+        .step-badge.view  { background:var(--view); }
+        .step-badge.core  { background:#34495e; }
+
+        /* código */
+        .code-header {
+            background:#272822; color:#f8f8f2;
+            padding:5px 15px; border-radius:5px 5px 0 0;
+            font-size:.78rem; font-family:monospace;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .code-header + pre { margin-top:0; border-radius:0 0 8px 8px !important; }
+        pre { font-size:.84rem; }
+
+        /* cajas */
+        .tip  { border-left:5px solid var(--mvc);  background:#eafaf6; padding:13px 17px; border-radius:0 8px 8px 0; margin:14px 0; }
+        .warn { border-left:5px solid var(--ctrl); background:#fff5f5; padding:13px 17px; border-radius:0 8px 8px 0; margin:14px 0; }
+        .info { border-left:5px solid var(--model);background:#eaf4fb; padding:13px 17px; border-radius:0 8px 8px 0; margin:14px 0; }
+
+        /* tarjeta de sección */
+        .card-section {
+            background:#fff; border-radius:14px;
+            box-shadow:0 6px 24px rgba(0,0,0,.06);
+            padding:36px 40px; margin-bottom:28px;
+        }
+        @media(max-width:575px){ .card-section{ padding:22px 18px; } }
+
+        /* árbol de archivos */
+        .tree {
+            background:#1e1e2e; color:#cdd6f4;
+            border-radius:12px; padding:20px 24px;
+            font-family:'Fira Code','Courier New',monospace;
+            font-size:.87rem; line-height:2;
+        }
+        .tree .dir  { color:#89b4fa; }
+        .tree .file { color:#a6e3a1; }
+        .tree .todo { color:#f9e2af; font-weight:700; }
+        .tree .done { color:#585b70; }
+        .tree .note { color:#585b70; font-style:italic; }
+
+        /* resaltado de sintaxis manual */
+        .kw   { color:#cba6f7; }
+        .fn   { color:#89b4fa; }
+        .str  { color:#a6e3a1; }
+        .vr   { color:#f38ba8; }
+        .cm   { color:#585b70; font-style:italic; }
+        .todo-c { color:#f9e2af; font-weight:700; }
+        .ph   { color:#fab387; }
+
+        /* checklist */
+        .chk-item { display:flex; gap:10px; align-items:flex-start; padding:9px 0; border-bottom:1px solid #f2f2f2; font-size:.9rem; }
+        .chk-item:last-child { border-bottom:none; }
+        .chk-box { width:20px; height:20px; border:2px solid #ccc; border-radius:4px; flex-shrink:0; margin-top:2px; }
+
+        /* tabla */
+        .table-cmp thead { background:#2c3e50; color:#fff; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="../index.html">ADSO <span class="text-info">PHP</span></a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="teoria.html">Teoría</a></li>
+                <li class="nav-item"><a class="nav-link" href="demo/index.php">Demo</a></li>
+                <li class="nav-item"><a class="nav-link" href="enunciado.html">Enunciado</a></li>
+                <li class="nav-item"><a class="nav-link active" href="#">Práctica</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+<div class="row">
+
+<!-- ── Sidebar ─────────────────────────────────── -->
+<div class="col-lg-2 d-none d-lg-block sidebar p-4 sticky-top">
+    <p class="text-uppercase fw-bold text-muted small mb-2">Pasos</p>
+    <nav class="nav flex-column">
+        <a class="nav-link" href="#intro">Introducción</a>
+        <a class="nav-link sep">── Core</a>
+        <a class="nav-link" href="#paso1">1 · index.php</a>
+        <a class="nav-link" href="#paso2">2 · Router</a>
+        <a class="nav-link" href="#paso3">3 · View</a>
+        <a class="nav-link sep">── MVC</a>
+        <a class="nav-link" href="#paso4">4 · Model</a>
+        <a class="nav-link" href="#paso5">5 · HomeCtrl</a>
+        <a class="nav-link" href="#paso6">6 · LibroCtrl</a>
+        <a class="nav-link sep">── Vistas</a>
+        <a class="nav-link" href="#paso7">7 · Layout</a>
+        <a class="nav-link" href="#paso8">8 · Libros</a>
+        <a class="nav-link sep">── Final</a>
+        <a class="nav-link" href="#verificar">Verificar</a>
+        <a class="nav-link" href="#criterios">Criterios</a>
+    </nav>
+</div>
+
+<!-- ── Contenido ───────────────────────────────── -->
+<div class="col-lg-10 p-4 p-lg-5">
+
+    <h1 class="display-4 fw-bold">Práctica MVC</h1>
+    <p class="lead text-muted">Construye una <strong>Tienda de Libros</strong> en PHP aplicando el patrón Model-View-Controller desde cero.</p>
+    <hr>
+
+    <!-- ═══ INTRO ═══ -->
+    <section id="intro">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <i class="fas fa-map-signs fa-2x" style="color:var(--mvc)"></i>
+                <div>
+                    <h3 class="mb-0">Antes de empezar</h3>
+                    <span class="text-muted small">Lo que necesitas saber</span>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <p>Todos los archivos de inicio ya están en <code>practica_app/</code> con los <code>???</code> marcados. Tu trabajo es reemplazar cada <span style="color:#f9e2af;font-weight:700;background:#2d2d2d;padding:1px 6px;border-radius:4px">???</span> con el código correcto.</p>
+                    <div class="info">
+                        <strong><i class="fas fa-terminal me-2"></i>Arranca el servidor desde <code>practica_app/</code>:</strong>
+                        <pre class="bg-dark text-success p-2 rounded mt-2 mb-0">cd practica_app
+php -S localhost:8080</pre>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <div class="tree">
+<span class="dir">practica_app/</span>
+├── <span class="todo">index.php</span>              <span class="note">← Paso 1</span>
+├── <span class="dir">core/</span>
+│   ├── <span class="todo">Router.php</span>         <span class="note">← Paso 2</span>
+│   └── <span class="todo">View.php</span>           <span class="note">← Paso 3</span>
+├── <span class="dir">models/</span>
+│   └── <span class="todo">Libro.php</span>          <span class="note">← Paso 4</span>
+├── <span class="dir">controllers/</span>
+│   ├── <span class="todo">HomeController.php</span> <span class="note">← Paso 5</span>
+│   └── <span class="todo">LibroController.php</span><span class="note">← Paso 6</span>
+└── <span class="dir">views/</span>
+    ├── <span class="dir">layout/</span>
+    │   ├── <span class="todo">header.php</span>     <span class="note">← Paso 7</span>
+    │   └── <span class="todo">footer.php</span>     <span class="note">← Paso 7</span>
+    ├── <span class="dir">home/</span>
+    │   ├── <span class="todo">index.php</span>      <span class="note">← Paso 7</span>
+    │   └── <span class="todo">404.php</span>        <span class="note">← Paso 7</span>
+    └── <span class="dir">libros/</span>
+        ├── <span class="todo">lista.php</span>      <span class="note">← Paso 8</span>
+        └── <span class="todo">show.php</span>       <span class="note">← Paso 8</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 1 — index.php ═══ -->
+    <section id="paso1">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge core">1</div>
+                <div>
+                    <h3 class="mb-0">Front Controller — <code>index.php</code></h3>
+                    <span class="badge bg-secondary">Core</span>
+                </div>
+            </div>
+
+            <p>El Front Controller es la <strong>única puerta de entrada</strong>. Todas las URLs de la app pasan por aquí. Su trabajo es mínimo: cargar las clases del core e iniciar el Router.</p>
+
+            <h6 class="mt-3">Tu tarea — reemplaza los <code>???</code>:</h6>
+            <div class="code-header"><span>practica_app/index.php</span></div>
+            <pre class="bg-dark text-light p-3"><span class="cm">&lt;?php</span>
+<span class="cm">// TODO 1: Carga core/View.php con require_once y __DIR__</span>
+<span class="todo-c">???</span>
+
+<span class="cm">// TODO 2: Carga core/Router.php con require_once y __DIR__</span>
+<span class="todo-c">???</span>
+
+<span class="cm">// TODO 3: Crea una instancia del Router y llama a despachar()</span>
+<span class="todo-c">???</span></pre>
+
+            <div class="tip">
+                <strong>Resultado esperado:</strong> Abrir <code>localhost:8080/index.php</code> no muestra errores aunque aún no estén implementados los controllers.
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 2 — Router ═══ -->
+    <section id="paso2">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge core">2</div>
+                <div>
+                    <h3 class="mb-0">Router — <code>core/Router.php</code></h3>
+                    <span class="badge bg-secondary">Core</span>
+                </div>
+            </div>
+
+            <p>El Router lee la URL, identifica qué Controller y qué método llamar, y los ejecuta. Es el equivalente al mesero del restaurante que toma el pedido y lo lleva a la cocina correcta.</p>
+
+            <div class="info mb-4">
+                <strong>Patrón de URL:</strong> <code>index.php?c=libro&amp;a=show&amp;id=2</code><br>
+                <code>$_GET['c']</code> = <code>'libro'</code> → clase <code>LibroController</code><br>
+                <code>$_GET['a']</code> = <code>'show'</code> → método <code>show()</code>
+            </div>
+
+            <h6>Tu tarea — completa los TODOs 4 al 9:</h6>
+            <div class="code-header"><span>practica_app/core/Router.php</span></div>
+            <pre class="bg-dark text-light p-3"><span class="kw">class</span> <span class="fn">Router</span>
+{
+    <span class="kw">public function</span> <span class="fn">despachar</span>(): <span class="kw">void</span>
+    {
+        <span class="cm">// TODO 4: Lee $_GET['c'], construye el nombre de la clase
+        // 'libro' → 'LibroController'  |  sin valor → 'HomeController'
+        // Pista: ucfirst(strtolower($c)) . 'Controller'</span>
+        <span class="todo-c">$clase = ???;</span>
+
+        <span class="cm">// TODO 5: Lee $_GET['a'], por defecto 'index'.
+        // Limpia con preg_replace('/[^a-zA-Z0-9_]/', '', $valor)</span>
+        <span class="todo-c">$accion = ???;</span>
+
+        <span class="cm">// TODO 6: Construye la ruta al archivo del controller
+        // Está en: __DIR__ . '/../controllers/' . $clase . '.php'</span>
+        <span class="todo-c">$archivo = ???;</span>
+
+        <span class="cm">// TODO 7: Si el archivo NO existe → fallback a HomeController::notFound</span>
+        <span class="todo-c">if (!file_exists($archivo)) {
+            ???
+        }</span>
+
+        <span class="cm">// TODO 8: Carga el archivo con require_once</span>
+        <span class="todo-c">???</span>
+
+        <span class="cm">// TODO 9: Instancia la clase y llama al método
+        // $obj = new $clase();  luego  $obj->$accion();</span>
+        <span class="todo-c">???</span>
+    }
+}</pre>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 3 — View ═══ -->
+    <section id="paso3">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge core">3</div>
+                <div>
+                    <h3 class="mb-0">View Helper — <code>core/View.php</code></h3>
+                    <span class="badge bg-secondary">Core</span>
+                </div>
+            </div>
+
+            <p>El View Helper es la función que usan los Controllers para renderizar HTML. Recibe el nombre de la vista y un array de datos, y ensambla: header + vista + footer.</p>
+
+            <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="tip">
+                        <strong>Así lo llama un Controller:</strong>
+                        <pre class="bg-dark text-light p-2 rounded mt-2 mb-0" style="font-size:.8rem">View::render('libros/lista', [
+    'titulo' => 'Catálogo',
+    'libros' => $libros,
+]);</pre>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="info">
+                        <strong><code>extract($datos)</code> convierte:</strong>
+                        <pre class="bg-dark text-light p-2 rounded mt-2 mb-0" style="font-size:.8rem">['titulo' => 'Catálogo',
+ 'libros' => [...]]
+// en variables sueltas:
+$titulo = 'Catálogo';
+$libros = [...];</pre>
+                    </div>
+                </div>
+            </div>
+
+            <h6>Tu tarea — completa el TODO 10:</h6>
+            <div class="code-header"><span>practica_app/core/View.php</span></div>
+            <pre class="bg-dark text-light p-3"><span class="kw">class</span> <span class="fn">View</span>
+{
+    <span class="kw">public static function</span> <span class="fn">render</span>(string <span class="vr">$vista</span>, array <span class="vr">$datos</span> = []): <span class="kw">void</span>
+    {
+        <span class="cm">// TODO 10a: Llama a extract($datos)</span>
+        <span class="todo-c">???</span>
+
+        <span class="cm">// TODO 10b: Carga views/layout/header.php con require_once y __DIR__</span>
+        <span class="todo-c">???</span>
+
+        <span class="cm">// TODO 10c: Carga views/{$vista}.php con require_once y __DIR__</span>
+        <span class="todo-c">???</span>
+
+        <span class="cm">// TODO 10d: Carga views/layout/footer.php con require_once y __DIR__</span>
+        <span class="todo-c">???</span>
+    }
+}</pre>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 4 — Model ═══ -->
+    <section id="paso4">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge model">4</div>
+                <div>
+                    <h3 class="mb-0">Model — <code>models/Libro.php</code></h3>
+                    <span class="badge" style="background:var(--model);color:#fff">Model</span>
+                </div>
+            </div>
+
+            <p>El Model gestiona los datos. En esta práctica los datos son un array estático, pero la <strong>interfaz de métodos es exactamente igual</strong> a como sería con una base de datos real.</p>
+
+            <div class="warn mb-4">
+                <strong>Regla de oro del Model:</strong> Este archivo NO genera HTML, NO hace <code>echo</code>, NO conoce <code>$_GET</code> ni <code>$_POST</code>. Solo métodos que reciben parámetros y retornan datos.
+            </div>
+
+            <h6>Tu tarea — TODOs 11 al 15:</h6>
+            <div class="code-header"><span>practica_app/models/Libro.php</span></div>
+            <pre class="bg-dark text-light p-3"><span class="kw">class</span> <span class="fn">Libro</span>
+{
+    <span class="cm">// TODO 11: Array con 5+ libros. Claves requeridas:
+    // id, titulo, autor, genero, anio, precio, descripcion, color</span>
+    <span class="kw">private static</span> array <span class="vr">$catalogo</span> = [
+        <span class="todo-c">// ej: ['id'=>1, 'titulo'=>'Cien años de soledad', ...]</span>
+    ];
+
+    <span class="cm">// TODO 12: todos() — retorna self::$catalogo</span>
+    <span class="kw">public static function</span> <span class="fn">todos</span>(): array { <span class="todo-c">???</span> }
+
+    <span class="cm">// TODO 13: buscar($id) — retorna el libro o null</span>
+    <span class="kw">public static function</span> <span class="fn">buscar</span>(int <span class="vr">$id</span>): ?array { <span class="todo-c">???</span> }
+
+    <span class="cm">// TODO 14: porGenero($genero) — retorna array filtrado
+    // Pista: array_values(array_filter(...))</span>
+    <span class="kw">public static function</span> <span class="fn">porGenero</span>(string <span class="vr">$genero</span>): array { <span class="todo-c">???</span> }
+
+    <span class="cm">// TODO 15: generos() — lista de géneros únicos
+    // Pista: array_unique(array_column(self::$catalogo, 'genero'))</span>
+    <span class="kw">public static function</span> <span class="fn">generos</span>(): array { <span class="todo-c">???</span> }
+
+    <span class="kw">public static function</span> <span class="fn">formatearPrecio</span>(int <span class="vr">$precio</span>): string {
+        <span class="kw">return</span> <span class="str">'$ '</span> . number_format(<span class="vr">$precio</span>, 0, <span class="str">','</span>, <span class="str">'.'</span>);
+    }
+}</pre>
+
+            <div class="tip">
+                <strong>Resultado esperado de cada método:</strong>
+                <ul class="mb-0 mt-2 small">
+                    <li><code>Libro::todos()</code> → array con todos los libros</li>
+                    <li><code>Libro::buscar(1)</code> → el libro con id 1, o <code>null</code></li>
+                    <li><code>Libro::porGenero('Novela')</code> → solo las novelas</li>
+                    <li><code>Libro::generos()</code> → <code>['Novela', 'Ciencia', ...]</code></li>
+                    <li><code>Libro::formatearPrecio(45000)</code> → <code>'$ 45.000'</code></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 5 — HomeController ═══ -->
+    <section id="paso5">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge ctrl">5</div>
+                <div>
+                    <h3 class="mb-0">Controller — <code>controllers/HomeController.php</code></h3>
+                    <span class="badge" style="background:var(--ctrl);color:#fff">Controller</span>
+                </div>
+            </div>
+
+            <p>El Controller recibe la petición, le pide los datos al Model y los pasa a la View. <strong>Nunca genera HTML, nunca hace SQL.</strong></p>
+
+            <h6>Tu tarea — TODOs 16 y 17:</h6>
+            <div class="code-header"><span>practica_app/controllers/HomeController.php</span></div>
+            <pre class="bg-dark text-light p-3"><span class="kw">class</span> <span class="fn">HomeController</span>
+{
+    <span class="cm">// TODO 16: index() — renderiza 'home/index' con al menos:
+    // 'titulo' => 'Bienvenido a LibroStore'</span>
+    <span class="kw">public function</span> <span class="fn">index</span>(): <span class="kw">void</span>
+    {
+        <span class="todo-c">???</span>
+    }
+
+    <span class="cm">// TODO 17: notFound() — código HTTP 404 + renderiza 'home/404'</span>
+    <span class="kw">public function</span> <span class="fn">notFound</span>(): <span class="kw">void</span>
+    {
+        <span class="todo-c">???</span>
+    }
+}</pre>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 6 — LibroController ═══ -->
+    <section id="paso6">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge ctrl">6</div>
+                <div>
+                    <h3 class="mb-0">Controller — <code>controllers/LibroController.php</code></h3>
+                    <span class="badge" style="background:var(--ctrl);color:#fff">Controller</span>
+                    <span class="badge bg-warning text-dark ms-1">Más complejo</span>
+                </div>
+            </div>
+
+            <p>Este controller tiene 3 acciones. Observa cómo <strong>cada acción sigue el mismo patrón</strong>: pide datos al Model y los pasa a la View.</p>
+
+            <h6>Tu tarea — TODOs 18, 19 y 20:</h6>
+            <div class="code-header"><span>practica_app/controllers/LibroController.php</span></div>
+            <pre class="bg-dark text-light p-3"><span class="kw">require_once</span> <span class="fn">__DIR__</span> . <span class="str">'/../models/Libro.php'</span>;
+
+<span class="kw">class</span> <span class="fn">LibroController</span>
+{
+    <span class="cm">// TODO 18: index() — todos los libros + géneros → 'libros/lista'
+    // Datos a pasar: 'titulo', 'libros', 'generos'</span>
+    <span class="kw">public function</span> <span class="fn">index</span>(): <span class="kw">void</span> { <span class="todo-c">???</span> }
+
+    <span class="cm">// TODO 19: show() — un libro por id → 'libros/show'
+    // 1. $id = (int)($_GET['id'] ?? 0)
+    // 2. $libro = Libro::buscar($id)
+    // 3. Si null → header('Location: ...notFound') + exit
+    // 4. Si existe → View::render con 'titulo' y 'libro'</span>
+    <span class="kw">public function</span> <span class="fn">show</span>(): <span class="kw">void</span> { <span class="todo-c">???</span> }
+
+    <span class="cm">// TODO 20: genero() — filtrar por género → 'libros/lista'
+    // 1. $genero = $_GET['g'] ?? ''
+    // 2. Si hay género: Libro::porGenero($genero), sino Libro::todos()
+    // 3. View::render con 'titulo', 'libros', 'generos', 'generoActivo'</span>
+    <span class="kw">public function</span> <span class="fn">genero</span>(): <span class="kw">void</span> { <span class="todo-c">???</span> }
+}</pre>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 7 — Layout ═══ -->
+    <section id="paso7">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge view">7</div>
+                <div>
+                    <h3 class="mb-0">Vistas — Layout y Home</h3>
+                    <span class="badge" style="background:var(--view);color:#fff">View</span>
+                </div>
+            </div>
+
+            <p>Las vistas solo tienen HTML y variables. <strong>Regla absoluta: ningún <code>new PDO()</code>, ningún <code>Libro::todos()</code> aquí.</strong></p>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6>header.php — TODOs 21–24</h6>
+                    <div class="code-header"><span>views/layout/header.php</span></div>
+                    <pre class="bg-dark text-light p-3" style="font-size:.78rem"><span class="cm">&lt;title&gt;</span>
+<span class="cm">  TODO 21: "{$titulo} · LibroStore"</span>
+<span class="todo-c">  &lt;?= e($titulo ?? 'Inicio') ?&gt; · LibroStore</span>
+<span class="cm">&lt;/title&gt;</span>
+<span class="cm">TODO 22: 2+ estilos CSS propios</span>
+<span class="cm">TODO 23: brand con emoji 📚 y "LibroStore"</span>
+<span class="cm">TODO 24: enlace "Catálogo" → ?c=libro&amp;a=index</span></pre>
+                </div>
+                <div class="col-md-6">
+                    <h6>footer.php — TODO 25</h6>
+                    <div class="code-header"><span>views/layout/footer.php</span></div>
+                    <pre class="bg-dark text-light p-3" style="font-size:.78rem"><span class="cm">TODO 25: Indicador MVC (igual que en demo)
+Cajita fija esquina inf-der mostrando:
+● Controller: LibroController
+● Model:      Libro.php
+● View:       libros/show.php</span></pre>
+                    <div class="tip mt-2">
+                        <strong>Pista:</strong> usa <code>$_GET['c'] ?? 'home'</code> y <code>$_GET['a'] ?? 'index'</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mt-1">
+                <div class="col-md-6">
+                    <h6>views/home/index.php — TODO 26</h6>
+                    <ul class="small">
+                        <li>Título con <code>$titulo</code></li>
+                        <li>Descripción breve de la tienda</li>
+                        <li>Botón al catálogo (<code>?c=libro&amp;a=index</code>)</li>
+                        <li>Bloque terminal con el flujo MVC de esta petición</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>views/home/404.php — TODO 27</h6>
+                    <ul class="small">
+                        <li>Emoji o ícono grande</li>
+                        <li>Texto "404"</li>
+                        <li>Mensaje amigable</li>
+                        <li>Botón para volver a <code>index.php</code></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PASO 8 — Vistas libros ═══ -->
+    <section id="paso8">
+        <div class="card-section">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="step-badge view">8</div>
+                <div>
+                    <h3 class="mb-0">Vistas — <code>views/libros/</code></h3>
+                    <span class="badge" style="background:var(--view);color:#fff">View</span>
+                    <span class="badge bg-warning text-dark ms-1">Las más visuales</span>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <h6>lista.php — TODOs 28–30</h6>
+                    <p class="small">Variables disponibles: <code>$titulo</code>, <code>$libros</code>, <code>$generos</code>, <code>$generoActivo</code></p>
+                    <div class="code-header"><span>views/libros/lista.php (estructura)</span></div>
+                    <pre class="bg-dark text-light p-2" style="font-size:.75rem"><span class="cm">&lt;!-- TODO 28: título + conteo de libros --&gt;</span>
+<span class="cm">&lt;!-- TODO 29: botones de filtro por género
+  Todos → ?c=libro&amp;a=index
+  {Género} → ?c=libro&amp;a=genero&amp;g={género}
+  Activo según $generoActivo --&gt;</span>
+<span class="cm">&lt;!-- TODO 30: tarjetas de libros (o alerta si vacío)
+  - color del borde: $libro['color']
+  - badge de género
+  - título y autor
+  - precio con Libro::formatearPrecio()
+  - botón → ?c=libro&amp;a=show&amp;id={id}
+  - USA e() en TODO --&gt;</span></pre>
+                </div>
+                <div class="col-md-6">
+                    <h6>show.php — TODOs 31–34</h6>
+                    <p class="small">Variable disponible: <code>$libro</code></p>
+                    <div class="code-header"><span>views/libros/show.php (estructura)</span></div>
+                    <pre class="bg-dark text-light p-2" style="font-size:.75rem"><span class="cm">&lt;!-- TODO 31: botón "← Volver al catálogo" --&gt;</span>
+<span class="cm">&lt;!-- TODO 32: portada visual con $libro['color'] --&gt;</span>
+<span class="cm">&lt;!-- TODO 33: información completa:
+  género (badge), título, autor, año,
+  descripción, precio formateado --&gt;</span>
+<span class="cm">&lt;!-- TODO 34: caja oscura con flujo MVC real:
+  GET ?c=libro&amp;a=show&amp;id={$libro['id']}
+  Router → LibroController::show()
+  Controller → Libro::buscar({id})
+  Model → retorna "{titulo}"
+  View → este HTML ✓ --&gt;</span></pre>
+                    <div class="warn mt-2">
+                        Usa <code>e()</code> en <strong>todos</strong> los valores de <code>$libro</code> que imprimas en HTML.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ VERIFICAR ═══ -->
+    <section id="verificar">
+        <div class="card-section">
+            <h3 class="mb-4"><i class="fas fa-vial me-2" style="color:var(--mvc)"></i>Verificar que todo funciona</h3>
+
+            <div class="row g-4">
+                <div class="col-md-7">
+                    <h6 class="fw-bold">URLs a probar en orden</h6>
+                    <table class="table table-bordered table-sm">
+                        <thead class="table-dark">
+                            <tr><th>URL</th><th>Resultado esperado</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>localhost:8080/index.php</code></td><td>Página de bienvenida con botón al catálogo</td></tr>
+                            <tr><td><code>?c=libro&amp;a=index</code></td><td>Lista de los 5+ libros con filtros</td></tr>
+                            <tr><td><code>?c=libro&amp;a=show&amp;id=1</code></td><td>Detalle del primer libro</td></tr>
+                            <tr><td><code>?c=libro&amp;a=genero&amp;g=Novela</code></td><td>Solo libros de género Novela</td></tr>
+                            <tr><td><code>?c=libro&amp;a=show&amp;id=999</code></td><td>Redirige a página 404</td></tr>
+                            <tr><td><code>?c=noexiste&amp;a=algo</code></td><td>Redirige a página 404</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-5">
+                    <h6 class="fw-bold">Checklist antes de entregar</h6>
+                    <div class="chk-item"><div class="chk-box"></div><span>El Model no tiene ningún <code>echo</code> ni HTML</span></div>
+                    <div class="chk-item"><div class="chk-box"></div><span>Los Controllers no tienen ninguna etiqueta HTML</span></div>
+                    <div class="chk-item"><div class="chk-box"></div><span>Las Views no tienen <code>new PDO()</code> ni <code>Libro::</code></span></div>
+                    <div class="chk-item"><div class="chk-box"></div><span>Todas las rutas usan <code>__DIR__</code></span></div>
+                    <div class="chk-item"><div class="chk-box"></div><span>El indicador MVC aparece en todas las páginas</span></div>
+                    <div class="chk-item"><div class="chk-box"></div><span>Se usa <code>e()</code> en todos los valores mostrados en HTML</span></div>
+                </div>
+            </div>
+
+            <div class="tip mt-3">
+                <strong><i class="fas fa-bug me-2"></i>Errores frecuentes:</strong>
+                <ul class="mb-0 mt-2 small">
+                    <li><strong>"Class not found"</strong> → el nombre de la clase en el archivo no coincide con el nombre del archivo.</li>
+                    <li><strong>"Call to undefined method"</strong> → la acción en <code>$_GET['a']</code> no existe en el Controller.</li>
+                    <li><strong>"require_once: failed to open"</strong> → la ruta está mal, verifica <code>__DIR__</code>.</li>
+                    <li><strong>Página en blanco</strong> → activa errores con <code>ini_set('display_errors','1');</code> al inicio de <code>index.php</code>.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ CRITERIOS ═══ -->
+    <section id="criterios">
+        <div class="card-section">
+            <h3 class="mb-4"><i class="fas fa-clipboard-check me-2 text-success"></i>Criterios de evaluación</h3>
+            <div class="table-responsive">
+                <table class="table table-bordered table-cmp align-middle">
+                    <thead>
+                        <tr><th>Componente</th><th class="text-center">Pts</th><th>Qué se verifica</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Router y View.php correctos</td><td class="text-center fw-bold">20</td><td>Las URLs funcionan y los datos llegan a las vistas</td></tr>
+                        <tr><td>Model — 4 métodos + 5 libros</td><td class="text-center fw-bold">20</td><td>Sin HTML, retornos correctos, datos coherentes</td></tr>
+                        <tr><td>Controllers sin HTML ni SQL</td><td class="text-center fw-bold">20</td><td>Solo llaman a Model y View, nada más</td></tr>
+                        <tr><td>Views sin lógica de negocio</td><td class="text-center fw-bold">20</td><td>Solo variables + HTML, usan <code>e()</code></td></tr>
+                        <tr><td>Filtro por género + 404</td><td class="text-center fw-bold">10</td><td>Funciona el filtro, id inválido redirige a 404</td></tr>
+                        <tr><td>Indicador MVC visible</td><td class="text-center fw-bold">10</td><td>Muestra Controller, Model y View en cada página</td></tr>
+                        <tr class="table-success fw-bold"><td>Total</td><td class="text-center">100</td><td></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Botones finales -->
+    <div class="d-flex gap-3 flex-wrap mt-4 mb-3">
+        <a href="teoria.html"    class="btn btn-outline-success btn-lg px-4 shadow-sm"><i class="fas fa-book me-2"></i>Repasar teoría</a>
+        <a href="demo/index.php" class="btn btn-outline-primary  btn-lg px-4 shadow-sm"><i class="fas fa-play me-2"></i>Ver demo de referencia</a>
+        <a href="enunciado.html" class="btn btn-outline-danger   btn-lg px-4 shadow-sm"><i class="fas fa-flag me-2"></i>Ver enunciado</a>
+    </div>
+
+</div><!-- /col-10 -->
+</div><!-- /row -->
+</div><!-- /container-fluid -->
+
+<footer class="bg-dark text-white py-4 mt-3">
+    <div class="container text-center">
+        <p class="mb-0">ADSO - Formación Profesional en PHP &copy; 2026</p>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const secs  = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.sidebar .nav-link:not(.sep)');
+    window.addEventListener('scroll', () => {
+        let cur = '';
+        secs.forEach(s => { if (window.scrollY >= s.offsetTop - 100) cur = s.id; });
+        links.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + cur));
+    });
+</script>
+</body>
+</html>
